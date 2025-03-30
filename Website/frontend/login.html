@@ -47,7 +47,7 @@
             try {
                 // Here you would typically make an API call to your backend
                 // For now, we'll simulate a successful login
-                const response = await fetch('http://localhost:3000/api/login', {
+                const response = await fetch('http://localhost:5000/api/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -60,6 +60,9 @@
                     // Store the token or user data in localStorage if needed
                     localStorage.setItem('userToken', data.token);
                     localStorage.setItem('userEmail', email);
+                    // Extract name from email (temporary solution until backend provides name)
+                    const name = email.split('@')[0];
+                    localStorage.setItem('userName', name);
                     
                     // Redirect to home page after successful login
                     window.location.href = 'Home page.HTML';

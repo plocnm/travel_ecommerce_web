@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý tài khoản</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+        }
+
+        .toggle-btn {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            z-index: 1000;
+            background: #c19a6b;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .toggle-btn:hover {
+            background: #deb887;
+        }
+
+        .sidebar {
+            width: 300px;
+            height: 100vh;
+            background-color: white;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            position: fixed;
+            left: -300px;
+            top: 0;
+            transition: left 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .user-header {
+            padding: 20px;
+            background: linear-gradient(to right, #c19a6b, #deb887);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .user-header h2 {
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        .user-header p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .menu-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .menu-item i {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-item.active {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+
+        .points {
+            display: flex;
+            align-items: center;
+            color: #333;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .points i {
+            margin-right: 15px;
+            color: #4a90e2;
+        }
+
+        .new-tag {
+            background-color: #ffd700;
+            color: black;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .content {
+            margin-left: 0;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .content.sidebar-active {
+            margin-left: 300px;
+        }
+
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .logout-btn {
+            margin-top: auto;
+            color: #ff4444;
+        }
+
+        @media (max-width: 768px) {
+            .content.sidebar-active {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="toggle-btn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+        Menu
+    </button>
+
+    <div class="sidebar">
+        <div class="user-header">
+            <h2 id="user-name">V&ocirc;circ; sắc Hoa</h2>
+            <p>Bạn là thành viên Bronze Priority</p>
+        </div>
+
+        <div class="points">
+            <i class="fas fa-coins"></i>
+            <span id="user-points">0 Điểm</span>
+        </div>
+
+        <a href="#profile" class="menu-item active" onclick="showSection('profile')">
+            <i class="fas fa-user"></i>
+            Chỉnh sửa hồ sơ
+        </a>
+
+        <a href="#cards" class="menu-item" onclick="showSection('cards')">
+            <i class="fas fa-credit-card"></i>
+            Thẻ của tôi
+        </a>
+
+        <a href="#transactions" class="menu-item" onclick="showSection('transactions')">
+            <i class="fas fa-list"></i>
+            Danh sách giao dịch
+        </a>
+
+        <a href="#bookings" class="menu-item" onclick="showSection('bookings')">
+            <i class="fas fa-bookmark"></i>
+            Đặt chỗ của tôi
+        </a>
+
+        <a href="#refund" class="menu-item" onclick="showSection('refund')">
+            <i class="fas fa-money-bill-wave"></i>
+            Hoàn tiền
+            <span class="new-tag">New!</span>
+        </a>
+
+        <a href="#notifications" class="menu-item" onclick="showSection('notifications')">
+            <i class="fas fa-bell"></i>
+            Thông báo giá vé máy bay
+        </a>
+
+        <a href="#passenger-info" class="menu-item" onclick="showSection('passenger-info')">
+            <i class="fas fa-users"></i>
+            Thông tin hành khách đã lưu
+        </a>
+
+        <a href="#promotions" class="menu-item" onclick="showSection('promotions')">
+            <i class="fas fa-gift"></i>
+            Khuyến mãi
+        </a>
+
+        <a href="#" class="menu-item logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i>
+            Đăng xuất
+        </a>
+    </div>
+
+    <div class="content">
+        <div id="profile-section" class="section active">
+            <!-- Profile content -->
+        </div>
+
+        <div id="cards-section" class="section">
+            <!-- Cards content -->
+        </div>
+
+        <div id="transactions-section" class="section">
+            <!-- Transactions content -->
+        </div>
+
+        <div id="bookings-section" class="section">
+            <!-- Bookings content -->
+        </div>
+
+        <div id="refund-section" class="section">
+            <!-- Refund content -->
+        </div>
+
+        <div id="notifications-section" class="section">
+            <!-- Notifications content -->
+        </div>
+
+        <div id="passenger-info-section" class="section">
+            <!-- Passenger info content -->
+        </div>
+
+        <div id="promotions-section" class="section">
+            <!-- Promotions content -->
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const content = document.querySelector('.content');
+            sidebar.classList.toggle('active');
+            content.classList.toggle('sidebar-active');
+        }
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(`${sectionId}-section`).classList.add('active');
+            
+            // Add active class to clicked menu item
+            event.currentTarget.classList.add('active');
+
+            // On mobile, close sidebar after selection
+            if (window.innerWidth <= 768) {
+                toggleSidebar();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('userData');
+            window.location.href = 'login.html';
+        }
+
+        // Load user data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('userToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if (userData) {
+                document.getElementById('user-name').textContent = userData.name;
+                // You can add more user data here
+            }
+        });
+    </script>
+</body>
+</html> 

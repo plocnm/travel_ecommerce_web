@@ -5,15 +5,199 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trang Web Du Lịch</title>
     <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .sidebar {
+            width: 300px;
+            height: 100vh;
+            background-color: white;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            position: fixed;
+            right: -350px;
+            top: 0;
+            transition: right 0.3s ease, visibility 0.3s, opacity 0.3s;
+            z-index: 999;
+            overflow-y: auto;
+            visibility: hidden;
+            opacity: 0;
+        }
+
+        .sidebar.active {
+            right: 0;
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .user-header {
+            padding: 20px;
+            background: linear-gradient(to right, #c19a6b, #deb887);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .user-header h2 {
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        .user-header p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .menu-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .menu-item i {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-item.active {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+
+        .points {
+            display: flex;
+            align-items: center;
+            color: #333;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .points i {
+            margin-right: 15px;
+            color: #4a90e2;
+        }
+
+        .new-tag {
+            background-color: #ffd700;
+            color: black;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .logout-btn {
+            margin-top: auto;
+            color: #ff4444;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        #admin-link {
+            cursor: pointer;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            background: #000;
+            transition: background-color 0.3s;
+        }
+
+        #admin-link:hover {
+            background: #333;
+        }
+    </style>
 </head>
 <body>
+    <div class="overlay" onclick="toggleSidebar()"></div>
+    
+    <div class="sidebar">
+        <div class="user-header">
+            <h2 id="sidebar-user-name">V&ocirc;circ; sắc Hoa</h2>
+            <p>Bạn là thành viên Bronze Priority</p>
+        </div>
+
+        <div class="points">
+            <i class="fas fa-coins"></i>
+            <span id="user-points">0 Điểm</span>
+        </div>
+
+        <a href="#profile" class="menu-item active" onclick="handleMenuClick('profile')">
+            <i class="fas fa-user"></i>
+            Chỉnh sửa hồ sơ
+        </a>
+
+        <a href="#cards" class="menu-item" onclick="handleMenuClick('cards')">
+            <i class="fas fa-credit-card"></i>
+            Thẻ của tôi
+        </a>
+
+        <a href="#transactions" class="menu-item" onclick="handleMenuClick('transactions')">
+            <i class="fas fa-list"></i>
+            Danh sách giao dịch
+        </a>
+
+        <a href="#bookings" class="menu-item" onclick="handleMenuClick('bookings')">
+            <i class="fas fa-bookmark"></i>
+            Đặt chỗ của tôi
+        </a>
+
+        <a href="#refund" class="menu-item" onclick="handleMenuClick('refund')">
+            <i class="fas fa-money-bill-wave"></i>
+            Hoàn tiền
+            <span class="new-tag">New!</span>
+        </a>
+
+        <a href="#notifications" class="menu-item" onclick="handleMenuClick('notifications')">
+            <i class="fas fa-bell"></i>
+            Thông báo giá vé máy bay
+        </a>
+
+        <a href="#passenger-info" class="menu-item" onclick="handleMenuClick('passenger-info')">
+            <i class="fas fa-users"></i>
+            Thông tin hành khách đã lưu
+        </a>
+
+        <a href="#promotions" class="menu-item" onclick="handleMenuClick('promotions')">
+            <i class="fas fa-gift"></i>
+            Khuyến mãi
+        </a>
+
+        <a href="#" class="menu-item logout-btn" onclick="handleLogout()">
+            <i class="fas fa-sign-out-alt"></i>
+            Đăng xuất
+        </a>
+    </div>
+
     <header>
         <h1>
-            <img src="images/image1.png" alt = "TrungLH Travel" width="120">
+            <img src="images/image1.png" alt="TrungLH Travel" width="120">
         </h1>
         <nav>
             <ul>
-                <li><a >TÊN</a></li>
+                <li><a id="admin-link" onclick="toggleSidebar()">admin</a></li>
                 <li><a>SỐ DƯ</a></li>
                 <li><a href="flight_booking.html">Đặt Vé Máy Bay</a></li>
                 <li><a href="hotel_booking.html">Đặt Khách Sạn</a></li>
@@ -36,7 +220,7 @@
     <section class="combo-container">
         
         <div class="tour-card">
-            <img src="images/halong-bay.jpg" alt="Tour Hạ Long">
+            <img src="images/halong-bay.png" alt="Tour Hạ Long">
             <div class="tour-info">
                 <h3>COMBO1</h3>
                 <p>3 ngày 2 đêm</p>
@@ -47,7 +231,7 @@
         </div>
 
         <div class="tour-card">
-            <img src="images/sapa.jpg" alt="Tour Sapa">
+            <img src="images/sapa.png" alt="Tour Sapa">
             <div class="tour-info">
                 <h3>COMBO2</h3>
                 <p>4 ngày 3 đêm</p>
@@ -58,7 +242,7 @@
         </div>
 
         <div class="tour-card">
-            <img src="images/nhatrang.jpg" alt="Tour Nha Trang">
+            <img src="images/nhatrang.png" alt="Tour Nha Trang">
             <div class="tour-info">
                 <h3>COMBO3</h3>
                 <p>3 ngày 2 đêm</p>
@@ -69,7 +253,7 @@
         </div>
 
         <div class="tour-card">
-            <img src="images/taynguyen.jpg" alt="Tour Tây Nguyên">
+            <img src="images/taynguyen.png" alt="Tour Tây Nguyên">
             <div class="tour-info">
                 <h3>COMBO4</h3>
                 <p>3 ngày 2 đêm</p>
@@ -79,7 +263,7 @@
             </div>
         </div>
         <div class="tour-card">
-            <img src="images/halong-bay.jpg" alt="Tour Hạ Long">
+            <img src="images/halong-bay.png" alt="Tour Hạ Long">
             <div class="tour-info">
                 <h3>COMBO1</h3>
                 <p>3 ngày 2 đêm</p>
@@ -90,7 +274,7 @@
         </div>
 
         <div class="tour-card">
-            <img src="images/sapa.jpg" alt="Tour Sapa">
+            <img src="images/sapa.png" alt="Tour Sapa">
             <div class="tour-info">
                 <h3>COMBO2</h3>
                 <p>4 ngày 3 đêm</p>
@@ -101,7 +285,7 @@
         </div>
 
         <div class="tour-card">
-            <img src="images/nhatrang.jpg" alt="Tour Nha Trang">
+            <img src="images/nhatrang.png" alt="Tour Nha Trang">
             <div class="tour-info">
                 <h3>COMBO3</h3>
                 <p>3 ngày 2 đêm</p>
@@ -112,7 +296,7 @@
         </div>
 
         <div class="tour-card">
-            <img src="images/taynguyen.jpg" alt="Tour Tây Nguyên">
+            <img src="images/taynguyen.png" alt="Tour Tây Nguyên">
             <div class="tour-info">
                 <h3>COMBO4</h3>
                 <p>3 ngày 2 đêm</p>
@@ -178,5 +362,51 @@
         </footer>
         
    
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function handleMenuClick(sectionId) {
+            // Remove active class from all menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to clicked menu item
+            event.currentTarget.classList.add('active');
+
+            // Hide the sidebar
+            toggleSidebar();
+        }
+
+        function handleLogout() {
+            // Hide the sidebar first
+            toggleSidebar();
+            
+            // Then perform logout after a small delay
+            setTimeout(() => {
+                localStorage.removeItem('userToken');
+                localStorage.removeItem('userData');
+                localStorage.removeItem('userName');
+                window.location.href = 'login.html';
+            }, 300); // Wait for sidebar animation to complete
+        }
+
+        // Check if user is logged in and display their name
+        document.addEventListener('DOMContentLoaded', function() {
+            const userName = localStorage.getItem('userName');
+            const sidebarUserName = document.getElementById('sidebar-user-name');
+            
+            if (userName) {
+                sidebarUserName.textContent = userName;
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
 </body>
 </html>

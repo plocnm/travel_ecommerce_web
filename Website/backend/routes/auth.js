@@ -6,21 +6,16 @@ const jwt = require('jsonwebtoken');
 // Login route
 router.post('/login', async (req, res) => {
     try {
-        console.log('Login attempt received:', { email: req.body.email });
         const { email, password } = req.body;
 
         // Find user by email
         const user = await User.findOne({ email });
-        console.log('User found:', user ? 'Yes' : 'No');
-        
         if (!user) {
             return res.status(401).json({ message: 'Email hoặc mật khẩu không chính xác' });
         }
 
         // Check password
         const isMatch = await user.comparePassword(password);
-        console.log('Password match:', isMatch ? 'Yes' : 'No');
-        
         if (!isMatch) {
             return res.status(401).json({ message: 'Email hoặc mật khẩu không chính xác' });
         }
@@ -31,8 +26,6 @@ router.post('/login', async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: '24h' }
         );
-
-        console.log('Login successful for user:', user.email);
 
         // Send response
         res.json({
@@ -45,7 +38,7 @@ router.post('/login', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Login error details:', error);
+        console.error('Login error:', error);
         res.status(500).json({ message: 'Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại sau.' });
     }
 });

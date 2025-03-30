@@ -16,7 +16,7 @@
             <input type="text" placeholder="Điểm đến" id="destination">
             <input type="date" placeholder="Ngày đi" id="departure-date">
             <input type="date" placeholder="Ngày về (nếu có)" id="return-date">
-            <select id="passenger-count">
+            <select id="passenger-count" title="Số hành khách">
                 <option value="1">1 hành khách</option>
                 <option value="2">2 hành khách</option>
                 <option value="3">3 hành khách</option>
@@ -25,10 +25,28 @@
             <button onclick="bookFlight()">Tìm chuyến bay</button>
         </div>
         
-        <p><a href="index.html">Quay lại trang chủ</a> | <a href="hotel_booking.html">Đặt khách sạn</a></p>
+        <p><a href="#" onclick="navigateHome()">Quay lại trang chủ</a> | <a href="hotel_booking.html">Đặt khách sạn</a></p>
     </div>
     
     <script>
+        // Check login status and handle navigation
+        function navigateHome() {
+            const userToken = localStorage.getItem('userToken');
+            if (userToken) {
+                window.location.href = 'Home page.HTML';
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Check login status when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const userToken = localStorage.getItem('userToken');
+            if (!userToken) {
+                window.location.href = 'login.html';
+            }
+        });
+
         function bookFlight() {
             let departure = document.getElementById('departure').value;
             let destination = document.getElementById('destination').value;

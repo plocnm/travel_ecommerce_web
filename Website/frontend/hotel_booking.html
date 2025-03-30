@@ -19,14 +19,10 @@
                        list="location-suggestions"
                        autocomplete="off">
                 <datalist id="location-suggestions">
-                    <option value="Hà Nội">
-                    <option value="Hồ Chí Minh">
-                    <option value="Đà Nẵng">
-                    <option value="Huế">
+                    <option value="Hạ Long">
+                    <option value="SaPa">
                     <option value="Nha Trang">
-                    <option value="Phú Quốc">
-                    <option value="Đà Lạt">
-                    <option value="Sapa">
+                    <option value="Buôn Ma Thuột">
                 </datalist>
             </div>
             <input type="date" placeholder="Ngày nhận phòng" id="checkin-date">
@@ -45,10 +41,28 @@
             <div id="hotels-list"></div>
         </div>
         
-        <p><a href="index.html">Quay lại trang chủ</a> | <a href="flight_booking.html">Đặt vé máy bay</a></p>
+        <p><a href="#" onclick="navigateHome()">Quay lại trang chủ</a> | <a href="flight_booking.html">Đặt vé máy bay</a></p>
     </div>
     
     <script>
+        // Check login status and handle navigation
+        function navigateHome() {
+            const userToken = localStorage.getItem('userToken');
+            if (userToken) {
+                window.location.href = 'Home page.HTML';
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Check login status when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const userToken = localStorage.getItem('userToken');
+            if (!userToken) {
+                window.location.href = 'login.html';
+            }
+        });
+
         // Set minimum date for check-in and check-out to today
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('checkin-date').min = today;
@@ -81,7 +95,7 @@
             }
 
             try {
-                const response = await fetch(`http://localhost:5000/api/hotels/search?location=${encodeURIComponent(location)}&checkinDate=${checkinDate}&checkoutDate=${checkoutDate}&rooms=${rooms}`);
+                const response = await fetch(`http://localhost:5500/api/hotels/search?location=${encodeURIComponent(location)}&checkinDate=${checkinDate}&checkoutDate=${checkoutDate}&rooms=${rooms}`);
                 const hotels = await response.json();
 
                 if (!response.ok) {
@@ -153,7 +167,7 @@
             const rooms = document.getElementById('room-count').value;
 
             try {
-                const response = await fetch('http://localhost:5000/api/hotels/book', {
+                const response = await fetch('http://localhost:5500/api/hotels/book', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

@@ -4,6 +4,7 @@ const Hotel = require('../models/Hotel');
 const Booking = require('../models/Booking');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { getLocationDetails, searchNearbyHotels } = require('../utils/ipGeolocation');
 
 // Hotel search endpoint
 router.get('/search', async (req, res) => {
@@ -54,8 +55,8 @@ router.get('/search', async (req, res) => {
             rooms
         });
 
-        // Find hotels in the specified location using case-insensitive search and multiple patterns
-        const hotels = await Hotel.find({
+        // 1. Search in database
+        const dbHotels = await Hotel.find({
             $or: [
                 { 'location.city': { $regex: vietnameseCity, $options: 'i' } },
                 { 'location.city': { $regex: location, $options: 'i' } },
@@ -64,14 +65,56 @@ router.get('/search', async (req, res) => {
             status: 'active'
         });
 
-        console.log(`Found ${hotels.length} hotels before availability filter`);
+        // 2. Get location details from IPGeolocation API
+        const locationDetails = await getLocationDetails(vietnameseCity);
+        let apiHotels = [];
 
-        // Filter hotels based on availability
-        const availableHotels = hotels.filter(hotel => {
+        if (locationDetails && locationDetails.latitude && locationDetails.longitude) {
+            const nearbyHotels = await searchNearbyHotels(
+                locationDetails.latitude,
+                locationDetails.longitude
+            );
+
+            if (nearbyHotels && nearbyHotels.places) {
+                apiHotels = nearbyHotels.places.map(place => ({
+                    _id: `api_${place.id}`,
+                    name: place.name,
+                    location: {
+                        city: vietnameseCity,
+                        address: place.address,
+                        coordinates: {
+                            latitude: place.latitude,
+                            longitude: place.longitude
+                        }
+                    },
+                    description: place.description || 'No description available',
+                    rating: place.rating || 0,
+                    amenities: place.amenities || [],
+                    images: place.images || [],
+                    rooms: [{
+                        type: 'standard',
+                        price: place.price || 0,
+                        capacity: 2,
+                        available: 1,
+                        description: 'Standard room'
+                    }],
+                    contact: {
+                        phone: place.phone || '',
+                        website: place.website || ''
+                    },
+                    status: 'active',
+                    source: 'api'
+                }));
+            }
+        }
+
+        // Combine and filter results
+        const allHotels = [...dbHotels, ...apiHotels];
+        const availableHotels = allHotels.filter(hotel => {
             return hotel.rooms.some(room => room.available >= parseInt(rooms));
         });
 
-        console.log(`Found ${availableHotels.length} hotels after availability filter`);
+        console.log(`Found ${availableHotels.length} hotels (${dbHotels.length} from DB, ${apiHotels.length} from API)`);
 
         res.json(availableHotels);
     } catch (error) {

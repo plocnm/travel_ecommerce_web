@@ -197,7 +197,7 @@
         </h1>
         <nav>
             <ul>
-                <li><a id="admin-link" onclick="toggleSidebar()">admin</a></li>
+                <li><a id="user-nav-link" onclick="toggleSidebar()">Tài khoản</a></li>
                 <li><a>SỐ DƯ</a></li>
                 <li><a href="flight_booking.html">Đặt Vé Máy Bay</a></li>
                 <li><a href="hotel_booking.html">Đặt Khách Sạn</a></li>
@@ -218,50 +218,6 @@
     <h3>Đặt Combo Du Lịch Với Giá Ưu Đãi Ngay</h3>
    
     <section class="combo-container">
-        
-        <div class="tour-card">
-            <img src="images/halong-bay.png" alt="Tour Hạ Long">
-            <div class="tour-info">
-                <h3>COMBO1</h3>
-                <p>3 ngày 2 đêm</p>
-                <p><strong>Vé Máy Bay + Trọn Gói Dịch Vụ</strong></p>
-                <p>Tour Hạ Long trọn gói 3 Ngày 2 Đêm</p>
-                <p class="price">2.299.000 VND</p>
-            </div>
-        </div>
-
-        <div class="tour-card">
-            <img src="images/sapa.png" alt="Tour Sapa">
-            <div class="tour-info">
-                <h3>COMBO2</h3>
-                <p>4 ngày 3 đêm</p>
-                <p><strong>Vé Máy Bay + Trọn Gói Dịch Vụ</strong></p>
-                <p>Tour SaPa trọn gói 4 Ngày 3 Đêm</p>
-                <p class="price">3.299.000 VND</p>
-            </div>
-        </div>
-
-        <div class="tour-card">
-            <img src="images/nhatrang.png" alt="Tour Nha Trang">
-            <div class="tour-info">
-                <h3>COMBO3</h3>
-                <p>3 ngày 2 đêm</p>
-                <p><strong>Vé Máy Bay + Trọn Gói Dịch Vụ</strong></p>
-                <p>Tour Nha Trang trọn gói 3 Ngày 2 Đêm</p>
-                <p class="price">2.999.000 VND</p>
-            </div>
-        </div>
-
-        <div class="tour-card">
-            <img src="images/taynguyen.png" alt="Tour Tây Nguyên">
-            <div class="tour-info">
-                <h3>COMBO4</h3>
-                <p>3 ngày 2 đêm</p>
-                <p><strong>Vé Máy Bay + Trọn Gói Dịch Vụ</strong></p>
-                <p>Tour Tây Nguyên trọn gói 3N2Đ + Teambuilding + Gala Dinner</p>
-                <p class="price">3.499.000 VND</p>
-            </div>
-        </div>
         <div class="tour-card">
             <img src="images/halong-bay.png" alt="Tour Hạ Long">
             <div class="tour-info">
@@ -392,7 +348,7 @@
                 localStorage.removeItem('userToken');
                 localStorage.removeItem('userData');
                 localStorage.removeItem('userName');
-                window.location.href = 'login.html';
+                window.location.href = 'index.html';
             }, 300); // Wait for sidebar animation to complete
         }
 
@@ -400,9 +356,11 @@
         document.addEventListener('DOMContentLoaded', function() {
             const userName = localStorage.getItem('userName');
             const sidebarUserName = document.getElementById('sidebar-user-name');
+            const userNavLink = document.getElementById('user-nav-link');
             
             if (userName) {
                 sidebarUserName.textContent = userName;
+                userNavLink.textContent = userName;
             } else {
                 window.location.href = 'login.html';
             }

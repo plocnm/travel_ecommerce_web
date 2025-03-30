@@ -34,7 +34,8 @@ app.use('/api/hotels', hotelRoutes);
 app.use('/api/flights', flightRoutes);
 app.use('/api/payments', paymentRoutes);
 
-const PORT = process.env.PORT || 5000;
+// Force port 5500
+const PORT = 5500;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on http://localhost:${PORT}`);
     console.log('CORS enabled for all origins');

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - TrungLH Travel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #ff6b6b;
+        }
+
+        .hero {
+            height: 100vh;
+            background-image: url('images/About Us Page.png');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .section {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .promotion {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            background: url('images/bg style.png') no-repeat center center;
+            background-size: cover;
+            padding: 4rem;
+            border-radius: 20px;
+            margin-top: -100px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .promotion img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .promotion-text {
+            color: white;
+        }
+
+        .promotion-text h2 {
+            color: #ff6b6b;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+
+        .promotion-text p {
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .founder {
+            text-align: center;
+            background: url('images/h1-background-img-1 1.png') no-repeat center center;
+            background-size: cover;
+            padding: 6rem 2rem;
+            color: white;
+            position: relative;
+        }
+
+        .founder::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 1;
+        }
+
+        .founder-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .founder img {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border: 4px solid white;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            text-align: center;
+            margin-top: 4rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-item h3 {
+            font-size: 2.5rem;
+            color: #ff6b6b;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-item p {
+            color: white;
+            font-weight: bold;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background-color: #ff6b6b;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 2rem;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #ff5252;
+        }
+
+        @media (max-width: 768px) {
+            .promotion {
+                grid-template-columns: 1fr;
+                margin-top: -50px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="Home page.HTML">
+                <img src="images/image1.png" alt="TrungLH Travel" width="120">
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="flight_booking.html">Đặt Vé Máy Bay</a></li>
+                    <li><a href="hotel_booking.html">Đặt Khách Sạn</a></li>
+                    <li><a href="payment.html">Nạp tiền</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>About Us</h1>
+    </section>
+
+    <section class="section">
+        <div class="promotion">
+            <div class="promotion-text">
+                <h2>Nền tảng du lịch hàng đầu Việt Nam</h2>
+                <p>
+                    TRUNG LH là một công ty du lịch hàng đầu Đông Nam Á, cho phép người dùng khám phá,
+                    đặt phòng và trải nghiệm một loạt các dịch vụ du lịch độc đáo. Mỗi tháng có hơn 30
+                    triệu lượt truy cập website của chúng tôi, giúp họ khám phá các điểm đến tuyệt vời.
+                </p>
+                <a href="#" class="button">View Packages</a>
+            </div>
+            <img src="images/Rectangle 19353.png" alt="Beautiful destination">
+        </div>
+    </section>
+
+    <section class="founder">
+        <div class="founder-content">
+            <img src="images/Boss.png" alt="Founder">
+            <h2>LÊ HOÀNG TRUNG</h2>
+            <p>Founder & CEO</p>
+            <p style="max-width: 800px; margin: 2rem auto;">
+                Được thành lập vào năm 2023 bởi ông LÊ HOÀNG TRUNG, một doanh nhân thành đạt
+                trong các lĩnh vực du lịch và công nghệ. Chúng tôi là một nền tảng du lịch trực tuyến
+                hàng đầu tại Việt Nam.
+            </p>
+            <div class="stats">
+                <div class="stat-item">
+                    <h3>78%</h3>
+                    <p>VACATIONS</p>
+                </div>
+                <div class="stat-item">
+                    <h3>55%</h3>
+                    <p>HONEYMOON</p>
+                </div>
+                <div class="stat-item">
+                    <h3>30%</h3>
+                    <p>MUSICAL EVENTS</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Smooth scroll animation for sections
+        const sections = document.querySelectorAll('.section');
+        
+        const checkScroll = () => {
+            sections.forEach(section => {
+                const sectionTop = section.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                
+                if (sectionTop < windowHeight * 0.75) {
+                    section.classList.add('visible');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', checkScroll);
+        window.addEventListener('load', checkScroll);
+    </script>
+</body>
+</html> 

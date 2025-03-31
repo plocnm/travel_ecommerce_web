@@ -83,16 +83,42 @@ a:hover {
     padding: 20px;
     margin-bottom: 20px;
     background: white;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hotel-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .hotel-card h3 {
     color: #333;
     margin-bottom: 15px;
+    font-size: 1.4em;
 }
 
 .hotel-card p {
     margin: 5px 0;
     color: #666;
+    line-height: 1.5;
+}
+
+/* Loading state */
+#hotels-list p {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-size: 1.1em;
+}
+
+/* Error state */
+#hotels-list p.error {
+    color: #dc3545;
+    text-align: center;
+    padding: 20px;
+    background-color: #fff5f5;
+    border-radius: 4px;
+    margin: 10px 0;
 }
 
 .room-types {
@@ -107,16 +133,24 @@ a:hover {
     padding: 15px;
     border-radius: 6px;
     border: 1px solid #eee;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.room-type:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .room-type h4 {
     color: #333;
     margin-bottom: 10px;
+    font-size: 1.2em;
 }
 
 .room-type button {
     background-color: #28a745;
     margin-top: 10px;
+    transition: background-color 0.2s ease;
 }
 
 .room-type button:hover {

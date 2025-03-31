@@ -206,7 +206,7 @@ const initializeDB = async () => {
                     days: 3,
                     nights: 2
                 },
-                price: 2299000,
+                price: 4598000,
                 included: ['Vé máy bay', 'Khách sạn', 'Ăn uống', 'Hoạt động tham quan', 'Hướng dẫn viên'],
                 excluded: ['Chi phí cá nhân'],
                 itinerary: [
@@ -241,7 +241,7 @@ const initializeDB = async () => {
                     days: 4,
                     nights: 3
                 },
-                price: 3299000,
+                price: 6598000,
                 included: ['Vé máy bay', 'Khách sạn', 'Ăn uống', 'Hoạt động tham quan', 'Hướng dẫn viên'],
                 excluded: ['Chi phí cá nhân'],
                 itinerary: [
@@ -280,7 +280,7 @@ const initializeDB = async () => {
                     days: 3,
                     nights: 2
                 },
-                price: 2999000,
+                price: 5998000,
                 included: ['Vé máy bay', 'Khách sạn', 'Ăn uống', 'Hoạt động tham quan', 'Hướng dẫn viên'],
                 excluded: ['Chi phí cá nhân'],
                 itinerary: [
@@ -315,7 +315,7 @@ const initializeDB = async () => {
                     days: 3,
                     nights: 2
                 },
-                price: 3499000,
+                price: 6998000,
                 included: ['Vé máy bay', 'Khách sạn', 'Ăn uống', 'Hoạt động tham quan', 'Hướng dẫn viên', 'Teambuilding', 'Gala Dinner'],
                 excluded: ['Chi phí cá nhân'],
                 itinerary: [

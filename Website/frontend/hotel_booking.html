@@ -94,6 +94,12 @@
                 return;
             }
 
+            // Show loading state
+            const resultsSection = document.getElementById('hotel-results');
+            const hotelsList = document.getElementById('hotels-list');
+            hotelsList.innerHTML = '<p>Đang tìm kiếm khách sạn...</p>';
+            resultsSection.style.display = 'block';
+
             try {
                 const response = await fetch(`http://localhost:5500/api/hotels/search?location=${encodeURIComponent(location)}&checkinDate=${checkinDate}&checkoutDate=${checkoutDate}&rooms=${rooms}`);
                 const hotels = await response.json();
@@ -104,7 +110,7 @@
 
                 displayHotels(hotels);
             } catch (error) {
-                alert(error.message);
+                hotelsList.innerHTML = `<p class="error">${error.message}</p>`;
             }
         }
 

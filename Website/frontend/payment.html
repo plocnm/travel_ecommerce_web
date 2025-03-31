@@ -14,8 +14,17 @@
             <img src="images/image2.png" alt="Mã QR thanh toán" id="qr-code">
         </div>
         
-        <p><a href="index.html">Quay lại trang chủ</a></p>
+        <p><a href="Home page.HTML">Quay lại trang chủ</a></p>
     </div>
-    
+
+    <script>
+        // Check login status when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const userName = localStorage.getItem('userName');
+            if (!userName) {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
 </body>
 </html>

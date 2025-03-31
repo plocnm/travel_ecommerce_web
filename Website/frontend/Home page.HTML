@@ -215,7 +215,7 @@
                 <li><a>SỐ DƯ</a></li>
                 <li><a href="flight_booking.html">Đặt Vé Máy Bay</a></li>
                 <li><a href="hotel_booking.html">Đặt Khách Sạn</a></li>
-                <li><a href="payment.html">Nạp tiền</a></li>
+                <li><a href="#" onclick="checkLoginAndNavigate('payment.html')">Nạp tiền</a></li>
             </ul>
         </nav>
     </header>
@@ -333,6 +333,15 @@
         
    
     <script>
+        function checkLoginAndNavigate(page) {
+            const userName = localStorage.getItem('userName');
+            if (!userName) {
+                window.location.href = 'login.html';
+            } else {
+                window.location.href = page;
+            }
+        }
+
         function toggleSidebar() {
             const sidebar = document.querySelector('.sidebar');
             const overlay = document.querySelector('.overlay');

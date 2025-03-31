@@ -139,7 +139,7 @@
             content.innerHTML = '';
             
             try {
-                const response = await fetch('/api/database');
+                const response = await fetch('/api/database-data');
                 if (!response.ok) {
                     throw new Error('Failed to fetch database data');
                 }

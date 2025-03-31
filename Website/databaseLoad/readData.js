@@ -1,5 +1,6 @@
-const mongoose = require('mongoose');
-require('dotenv').config();
+const mongoose = require('../backend/node_modules/mongoose');
+const path = require('path');
+require('../backend/node_modules/dotenv').config({ path: path.join(__dirname, '../backend/.env') });
 
 // Import models
 const User = require('../backend/models/User');

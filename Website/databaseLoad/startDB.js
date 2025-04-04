@@ -26,7 +26,7 @@ const startServer = () => {
     });
 
     // Start the server
-    const port = 5500;
+    const port = 5501;
     app.listen(port, () => {
         console.log(`Server is running on http://localhost:${port}`);
     });
@@ -101,7 +101,7 @@ const main = async () => {
         
         console.log('\nServer is running and database data has been loaded.');
         console.log('Press Ctrl+C to stop the server.\n');
-        console.log('Database viewer available at http://localhost:5500/database\n');
+        console.log('Database viewer available at http://localhost:5501/database\n');
         
         // Handle cleanup on exit
         process.on('SIGINT', () => {

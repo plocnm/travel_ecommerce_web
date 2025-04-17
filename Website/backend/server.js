@@ -9,7 +9,8 @@ const authRoutes = require('./routes/auth');
 const hotelRoutes = require('./routes/hotels');
 const flightRoutes = require('./routes/flights');
 const paymentRoutes = require('./routes/payments');
-const userRoutes = require('./routes/users'); // Add this line
+const userRoutes = require('./routes/users'); 
+const tourRoutes = require('./routes/tours');
 
 const app = express();
 
@@ -51,6 +52,7 @@ app.use('/api/hotels', hotelRoutes);
 app.use('/api/flights', flightRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/users', userRoutes); // Add this line
+app.use('/api/tours', tourRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {

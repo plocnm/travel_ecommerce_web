@@ -1,8 +1,8 @@
-    const express = require('express');
-    const cors = require('cors');
-    const connectDB = require('./serverConnect');
-    const path = require('path');
-    require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const connectDB = require('./serverConnect');
+const path = require('path');
+require('dotenv').config();
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -10,14 +10,14 @@ const hotelRoutes = require('./routes/hotels');
 const flightRoutes = require('./routes/flights');
 const paymentRoutes = require('./routes/payments');
 
-    const app = express();
+const app = express();
 
-    // Middleware
-    app.use(cors({
-        origin: ['http://localhost:8000', 'http://127.0.0.1:8000'],
-        credentials: true
-    }));
-    app.use(express.json());
+// Middleware
+app.use(cors({
+    origin: ['http://localhost:8000', 'http://127.0.0.1:8000'],
+    credentials: true
+}));
+app.use(express.json());
 
 // Debug middleware
 app.use((req, res, next) => {
@@ -28,8 +28,8 @@ app.use((req, res, next) => {
 // Serve static files from the frontend directory
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-    // Connect to MongoDB
-    connectDB();
+// Connect to MongoDB
+connectDB();
 
 // Routes
 app.use('/api/auth', authRoutes);

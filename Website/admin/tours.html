@@ -3,174 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tour Management - Admin Dashboard</title>
+    <title>Tour Management - Travel E-commerce Admin</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Add Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">">
-    <!-- Add Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Add this to the head section of each admin page -->v class="dashboard-container">
-    <script src="admin-utils.js"></script>  <!-- Sidebar Navigation -->
-</head>v class="container-fluid">
-<body>ogo">v class="row">
-    <div class="container-fluid">included from admin.js -->
-        <div class="row">bar" class="col-md-2"></div>
-            <!-- Sidebar will be included from admin.js -->            <ul class="nav-links">
-            <div id="sidebar" class="col-md-2"></div>">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <main class="col-md-10 ms-sm-auto px-md-4">e"></i>
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1>Quản lý đơn đặt</h1>oup">
-                    <div class="btn-toolbar mb-2 mb-md-0">nput" class="form-control" placeholder="Tìm kiếm đơn đặt...">
-                        <div class="input-group">n-outline-secondary" type="button" id="refreshBtn">
-                            <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm đơn đặt...">
-                            <button class="btn btn-outline-secondary" type="button" id="refreshBtn"> fa-map-marked-alt"></i>
-                                <i class="fas fa-sync-alt"></i>Tour Management</span>
-                            </button>
-                        </div>
-                    </div>                <li>
-                </div>ml">s Table -->
-"></i>          <div class="table-responsive">
-                <!-- Orders Table -->le table-striped table-hover">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead> <th>Mã đơn</th>
-                            <tr><th>Khách hàng</th>
-                                <th>Mã đơn</th>t"></i>
-                                <th>Khách hàng</th>pan>
-                                <th>Loại dịch vụ</th>
-                                <th>Ngày đặt</th>anh toán</th>
-                                <th>Tổng tiền</th></th>
-                                <th>Trạng thái thanh toán</th>
-                                <th>Trạng thái đơn</th>
-                                <th>Thao tác</th>->
-                            </tr>="ordersTableBody">
-                        </thead> Table content will be populated by JavaScript -->
-                        <tbody id="ordersTableBody">ent</h1>
-                            <!-- Table content will be populated by JavaScript -->user-info">
-                        </tbody>pan class="admin-name">Admin User</span>
-                    </table>                    <a href="#" class="logout-btn" onclick="logout()">
-                </div>-sign-out-alt"></i>
-                <div id="loadingSpinner" class="text-center d-none">
-                <!-- Loading Spinner -->border text-primary" role="status">
-                <div id="loadingSpinner" class="text-center d-none">pan>
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Đang tải...</span>
-                    </div>            <!-- Tour Management Section -->
-                </div>ction">ert -->
-                <div id="errorAlert" class="alert alert-danger d-none" role="alert">
-                <!-- Error Alert -->utton class="add-btn" onclick="showAddTourForm()">
-                <div id="errorAlert" class="alert alert-danger d-none" role="alert">     <i class="fas fa-plus"></i> Add New Tour
-                </div>      </button>
-            </main>          <div class="search-bar">
-        </div>                        <input type="text" id="searchTour" placeholder="Search tours...">
-    </div>="fas fa-search"></i>>
-    <div class="modal fade" id="statusModal" tabindex="-1">
-    <!-- Status Update Modal -->">
-    <div class="modal fade" id="statusModal" tabindex="-1">
-        <div class="modal-dialog">header">
-            <div class="modal-content">tle">Cập nhật trạng thái đơn</h5>
-                <div class="modal-header">class="btn-close" data-bs-dismiss="modal"></button>
-                    <h5 class="modal-title">Cập nhật trạng thái đơn</h5>  <thead>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>h>m id="updateStatusForm">
-                <div class="modal-body">den" id="orderIdInput">
-                    <form id="updateStatusForm">on</th>
-                        <input type="hidden" id="orderIdInput">rm-label">Trạng thái mới</label>
-                        <div class="mb-3">"form-select" id="statusSelect" required>
-                            <label for="statusSelect" class="form-label">Trạng thái mới</label>
-                            <select class="form-select" id="statusSelect" required>
-                                <option value="pending">Chờ xử lý</option>on>
-                                <option value="confirmed">Đã xác nhận</option>
-                                <option value="completed">Hoàn thành</option>e rows will be populated by JavaScript -->
-                                <option value="cancelled">Đã hủy</option>y>
-                            </select>>
-                        </div>
-                    </form>"modal-footer">
-                </div>utton type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <div class="modal-footer">class="btn btn-primary" id="saveStatusBtn">Lưu thay đổi</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>ourModal" class="modal">
-                    <button type="button" class="btn btn-primary" id="saveStatusBtn">Lưu thay đổi</button>iv class="modal-content">
-                </div>      <span class="close-btn" onclick="closeTourModal()">&times;</span>
-            </div>          <h2 id="modalTitle">Add New Tour</h2>
-        </div>                    <form id="tourForm" onsubmit="handleTourSubmit(event)">
-    <a href="#" class="logout-btn" onclick="logout()" title="Logout from admin panel">
-        <i class="fas fa-sign-out-alt"></i> Logout
-    <a href="#" class="logout-btn" onclick="logout()">
-    <!-- Bootstrap Bundle with Popper -->       <label for="tourName">Tour Name</label>ame">Tour Name</label>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>ype="text" id="tourName" required>
-    <!-- Admin JS -->            </div>
-    <script src="admin.js"></script>oup">
-    <!-- Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-        <div class="form-group">
-            <label for="destination">Destination</label>
-            <input type="text" id="destination" name="destination" placeholder="Enter tour destination" title="Tour destination" required>
-        </div>
-        document.addEventListener('DOMContentLoaded', () => {
-            loadOrders();             <div class="form-row">   <div class="form-row">
-            setupEventListeners();               <div class="form-group">
-        });                         <label for="durationDays">Days</label>abel for="durationDays">Days</label>
-    </script>                         <input type="number" id="durationDays" min="1" required>nput type="number" id="durationDays" min="1" required>
+    <script src="admin-utils.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <a href="/Website/frontend/Home page.HTML">
+                    <img src="/Website/frontend/images/image1.png" alt="TrungLH Travel" width="120">
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li>
+                    <a href="index.html">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="tours.html" class="active">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>Tour Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="users.html">
+                        <i class="fas fa-users"></i>
+                        <span>User Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="orders.html">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Order Management</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1>Tour Management</h1>
+                <div class="user-info">
+                    <span class="admin-name">Admin User</span>
+                </div>
+            </header>
 
-</html></body>                            </div>
+            <section class="tours-section">
+                <div class="actions-bar">
+                    <button type="button" class="add-btn" onclick="showAddTourForm()">
+                        <i class="fas fa-plus"></i> Add New Tour
+                    </button>
+                    <div class="search-bar">
+                        <input type="text" id="searchTour" placeholder="Search tours...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+
+                <!-- Tours Table -->
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tour Name</th>
+                                <th>Destination</th>
+                                <th>Duration</th>
+                                <th>Price (VND)</th>
+                                <th>Status</th>
+                                <th>Participants</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="toursTableBody">
+                            <!-- Table content will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div id="loadingSpinner" class="spinner hidden">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+
+                <!-- Alerts -->
+                <div id="errorAlert" class="alert alert-danger hidden"></div>
+                <div id="successAlert" class="alert alert-success hidden"></div>
+            </section>
+
+            <!-- Tour Modal -->
+            <div id="tourModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-btn" onclick="closeTourModal()">&times;</span>
+                    <h2 id="modalTitle">Add New Tour</h2>
+                    <form id="tourForm" onsubmit="handleTourSubmit(event)">
+                        <div class="form-group">
+                            <label for="tourName">Tour Name</label>
+                            <input type="text" id="tourName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="destination">Destination</label>
+                            <input type="text" id="destination" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="durationDays">Days</label>
+                                <input type="number" id="durationDays" min="1" required>
+                            </div>
                             <div class="form-group">
                                 <label for="durationNights">Nights</label>
                                 <input type="number" id="durationNights" min="1" required>
-                            </div> });            setupEventListeners();            loadOrders();
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="price">Price (VND)</label>
                             <input type="number" id="price" min="0" required>
-                        </div>  <input type="number" id="durationNights" min="1" required>
+                        </div>
                         <div class="form-group">
                             <label for="description">Description</label>
                             <textarea id="description" rows="4" required></textarea>
-                        </div>abel for="price">Price (VND)</label>
-                        <div class="form-group"> id="price" min="0" required>
+                        </div>
+                        <div class="form-group">
                             <label for="maxParticipants">Max Participants</label>
                             <input type="number" id="maxParticipants" min="1" required>
-                        </div>abel for="description">Description</label>
-                        <div class="form-group">ption" rows="4" required></textarea>
+                        </div>
+                        <div class="form-group">
                             <label for="status">Status</label>
                             <select id="status" required>
-                                <option value="active">Active</option>nts</label>
-                                <option value="inactive">Inactive</option>"1" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
                                 <option value="sold-out">Sold Out</option>
-                            </select>orm-group">
-                        </div>abel for="status">Status</label>
-                        <div class="form-actions">quired>
-                            <button type="button" onclick="closeTourModal()" class="cancel-btn">Cancel</button>
-                            <button type="submit" class="save-btn">Save Tour</button>
-                        </div>  <option value="sold-out">Sold Out</option>
-                    </form> </select>
-                </div>  </div>
-            </div>      <div class="form-actions">
-                            <button type="button" onclick="closeTourModal()" class="cancel-btn">Cancel</button>
-            <!-- Delete Confirmation Modal -->it" class="save-btn">Save Tour</button>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" onclick="closeTourModal()" class="btn">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Tour</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete Confirmation Modal -->
             <div id="deleteModal" class="modal">
                 <div class="modal-content">
                     <h2>Confirm Deletion</h2>
                     <p>Are you sure you want to delete this tour?</p>
                     <div class="form-actions">
-                        <button type="button" onclick="closeDeleteModal()" class="cancel-btn">Cancel</button>
-                        <button type="button" onclick="confirmDelete()" class="delete-btn">Delete</button>
-                    </div>="modal-content">
-                </div>2>Confirm Deletion</h2>
-    </div>              
-                        <button type="button" onclick="closeDeleteModal()" class="cancel-btn" title="Cancel deletion">Cancel</button>
-                        <button type="button" onclick="confirmDelete()" class="delete-btn" title="Confirm deletion">Delete</button>
-    </div>              <button onclick="closeDeleteModal()" class="cancel-btn">Cancel</button>
-                        <button onclick="confirmDelete()" class="delete-btn">Delete</button>
+                        <button onclick="closeDeleteModal()" class="btn">Cancel</button>
+                        <button onclick="confirmDelete()" class="btn btn-danger">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
     <script src="admin.js"></script>
     <script>
-        // Check authentication on page load
         document.addEventListener('DOMContentLoaded', function() {
-            if (!localStorage.getItem('adminToken')) {
-                window.location.href = 'login.html';
+            const userToken = localStorage.getItem('userToken');
+            const userRole = localStorage.getItem('userRole');
+            
+            if (!userToken || userRole !== 'admin') {
+                window.location.href = '/frontend/login.html';
+                return;
             }
+            
+            // Set admin name in header
+            const userName = localStorage.getItem('userName');
+            if (userName) {
+                document.querySelector('.admin-name').textContent = userName;
+            }
+
             loadTours();
         });
     </script>

@@ -47,156 +47,194 @@
     <script src="admin-utils.js"></script>
 </head>
 <body>
-    <div class="admin-container">
-        <h1>User Management</h1>
-        
-        <div class="table-container">
-            <table class="users-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="usersTableBody">
-                    <!-- User data will be populated here -->
-                </tbody>
-            </table>
-        </div>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <a href="/Website/frontend/Home page.HTML">
+                    <img src="/Website/frontend/images/image1.png" alt="TrungLH Travel" width="120">
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li>
+                    <a href="index.html">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="tours.html">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>Tour Management</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="users.html">
+                        <i class="fas fa-users"></i>
+                        <span>User Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="orders.html">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Order Management</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
-        <!-- Loading spinner -->
-        <div id="loadingSpinner" class="spinner" style="display: none;">
-            Loading...
-        </div>
+        <main class="main-content">
+            <header class="top-bar">
+                <h1>User Management</h1>
+                <div class="user-info">
+                    <span class="admin-name">Admin User</span>
+                </div>
+            </header>
 
-        <!-- Error message -->
-        <div id="errorMessage" class="error-message" style="display: none;">
-        </div>
-    </div>
+            <div class="content-wrapper">
+                <div class="table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- User data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
 
-    <!-- Keep only one logout button -->
-    <a href="#" class="logout-btn" onclick="handleLogout()">
-        <i class="fas fa-sign-out-alt"></i>
-        Logout
-    </a>
+                <!-- Loading spinner -->
+                <div id="loadingSpinner" class="spinner" style="display: none;">
+                    Loading...
+                </div>
 
-    <script>
-        // User row template
-        const userRowTemplate = (user) => `
-            <tr data-user-id="${user._id}">
-                <td>${user.name}</td>
-                <td>${user.email}</td>
-                <td>${user.role}</td>
-                <td class="status-${user.status ? 'active' : 'locked'}">
-                    ${user.status ? 'Active' : 'Locked'}
-                </td>
-                <td>
-                    <button 
-                        class="action-btn role-btn" 
-                        onclick="toggleRole('${user._id}', '${user.role}')">
-                        ${user.role === 'user' ? 'Promote to Admin' : 'Demote to User'}
-                    </button>
-                    <button 
-                        class="action-btn lock-btn" 
-                        onclick="toggleStatus('${user._id}', ${user.status})">
-                        ${user.status ? 'Lock User' : 'Unlock User'}
-                    </button>
-                </td>
-            </tr>
-        `;
+                <!-- Error message -->
+                <div id="errorMessage" class="error-message" style="display: none;">
+                </div>
+            </div>
+        </main>
 
-        // Check admin authentication
-        function checkAuth() {
-            const token = localStorage.getItem('userToken');
-            const userRole = localStorage.getItem('userRole');
-            
-            if (!token || userRole !== 'admin') {
-                window.location.href = '/frontend/login.html';
-            }
-            return token;
-        }
+        <script>
+            // User row template
+            const userRowTemplate = (user) => `
+                <tr data-user-id="${user._id}">
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.role}</td>
+                    <td class="status-${user.status ? 'active' : 'locked'}">
+                        ${user.status ? 'Active' : 'Locked'}
+                    </td>
+                    <td>
+                        <button 
+                            class="action-btn role-btn" 
+                            onclick="toggleRole('${user._id}', '${user.role}')">
+                            ${user.role === 'user' ? 'Promote to Admin' : 'Demote to User'}
+                        </button>
+                        <button 
+                            class="action-btn lock-btn" 
+                            onclick="toggleStatus('${user._id}', ${user.status})">
+                            ${user.status ? 'Lock User' : 'Unlock User'}
+                        </button>
+                    </td>
+                </tr>
+            `;
 
-        // Fetch and display users
-        async function loadUsers() {
-            const spinner = document.getElementById('loadingSpinner');
-            const errorMessage = document.getElementById('errorMessage');
-            const token = checkAuth();
-            
-            try {
-                spinner.style.display = 'block';
-                errorMessage.style.display = 'none';
+            // Check admin authentication
+            function checkAuth() {
+                const token = localStorage.getItem('userToken');
+                const userRole = localStorage.getItem('userRole');
                 
-                const response = await fetch('/api/users', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Failed to fetch users');
+                if (!token || userRole !== 'admin') {
+                    window.location.href = '/frontend/login.html';
                 }
+                return token;
+            }
+
+            // Fetch and display users
+            async function loadUsers() {
+                const spinner = document.getElementById('loadingSpinner');
+                const errorMessage = document.getElementById('errorMessage');
+                const token = checkAuth();
                 
-                const users = await response.json();
-                const tableBody = document.getElementById('usersTableBody');
-                tableBody.innerHTML = users.map(user => userRowTemplate(user)).join('');
-            } catch (error) {
-                console.error('Error:', error);
-                errorMessage.textContent = error.message;
-                errorMessage.style.display = 'block';
-            } finally {
-                spinner.style.display = 'none';
+                try {
+                    spinner.style.display = 'block';
+                    errorMessage.style.display = 'none';
+                    
+                    const response = await fetch('/api/users', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Failed to fetch users');
+                    }
+                    
+                    const users = await response.json();
+                    const tableBody = document.getElementById('usersTableBody');
+                    tableBody.innerHTML = users.map(user => userRowTemplate(user)).join('');
+                } catch (error) {
+                    console.error('Error:', error);
+                    errorMessage.textContent = error.message;
+                    errorMessage.style.display = 'block';
+                } finally {
+                    spinner.style.display = 'none';
+                }
             }
-        }
 
-        // Toggle user role
-        async function toggleRole(userId, currentRole) {
-            const newRole = currentRole === 'user' ? 'admin' : 'user';
-            await updateUser(userId, { role: newRole });
-        }
-
-        // Toggle user status
-        async function toggleStatus(userId, currentStatus) {
-            await updateUser(userId, { status: !currentStatus });
-        }
-
-        // Update user
-        async function updateUser(userId, updateData) {
-            const errorMessage = document.getElementById('errorMessage');
-            const token = checkAuth();
-            
-            try {
-                const response = await fetch(`/api/users/${userId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(updateData)
-                });
-
-                if (!response.ok) throw new Error('Failed to update user');
-                await loadUsers();
-            } catch (error) {
-                errorMessage.textContent = error.message;
-                errorMessage.style.display = 'block';
+            // Toggle user role
+            async function toggleRole(userId, currentRole) {
+                const newRole = currentRole === 'user' ? 'admin' : 'user';
+                await updateUser(userId, { role: newRole });
             }
-        }
 
-        // Load users when page loads
-        document.addEventListener('DOMContentLoaded', loadUsers);
+            // Toggle user status
+            async function toggleStatus(userId, currentStatus) {
+                await updateUser(userId, { status: !currentStatus });
+            }
 
-        function handleLogout() {
-            localStorage.removeItem('userToken');
-            localStorage.removeItem('userData');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userRole');
-        }
-    </script>
+            // Update user
+            async function updateUser(userId, updateData) {
+                const errorMessage = document.getElementById('errorMessage');
+                const token = checkAuth();
+                
+                try {
+                    const response = await fetch(`/api/users/${userId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(updateData)
+                    });
+
+                    if (!response.ok) throw new Error('Failed to update user');
+                    await loadUsers();
+                } catch (error) {
+                    errorMessage.textContent = error.message;
+                    errorMessage.style.display = 'block';
+                }
+            }
+
+            // Load users when page loads
+            document.addEventListener('DOMContentLoaded', loadUsers);
+
+            function handleLogout() {
+                localStorage.removeItem('userToken');
+                localStorage.removeItem('userData');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userRole');
+            }
+        </script>
+    </div>
 </body>
 </html>

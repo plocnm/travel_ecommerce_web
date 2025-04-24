@@ -4,11 +4,11 @@ const connectDB = require('./serverConnect');
 const path = require('path');
 require('dotenv').config();
 
-    // Import routes
-    const authRoutes = require('./routes/auth');
-    const hotelRoutes = require('./routes/hotels');
-    const flightRoutes = require('./routes/flights');
-    const paymentRoutes = require('./routes/payments');
+// Import routes
+const authRoutes = require('./routes/auth');
+const hotelRoutes = require('./routes/hotels');
+const flightRoutes = require('./routes/flights');
+const paymentRoutes = require('./routes/payments');
 
 const app = express();
 
@@ -19,26 +19,26 @@ app.use(cors({
 }));
 app.use(express.json());
 
-    // Debug middleware
-    app.use((req, res, next) => {
-        console.log(`${req.method} ${req.url}`);
-        next();
-    });
+// Debug middleware
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+});
 
-    // Serve static files from the frontend directory
-    app.use(express.static(path.join(__dirname, '../frontend')));
+// Serve static files from the frontend directory
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Connect to MongoDB
 connectDB();
 
-    // Routes
-    app.use('/api/auth', authRoutes);
-    app.use('/api/hotels', hotelRoutes);
-    app.use('/api/flights', flightRoutes);
-    app.use('/api/payments', paymentRoutes);
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/hotels', hotelRoutes);
+app.use('/api/flights', flightRoutes);
+app.use('/api/payments', paymentRoutes);
 
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, '0.0.0.0', () => {
-        console.log(`Server is running on http://localhost:${PORT}`);
-        console.log('CORS enabled for all origins');
-    }); 
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log('CORS enabled for all origins');
+}); 

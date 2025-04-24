@@ -47,40 +47,20 @@
             }
         });
 
-        async function bookFlight() {
-    let departure = document.getElementById('departure').value;
-    let destination = document.getElementById('destination').value;
-    let departureDate = document.getElementById('departure-date').value;
-    let passengers = document.getElementById('passenger-count').value;
-
-    if (!departure || !destination || !departureDate) {
-        alert("Vui lòng nhập đầy đủ thông tin chuyến bay.");
-        return;
-    }
-
-    try {
-        const response = await fetch(`http://localhost:5000/api/flights/search?departure=${departure}&arrival=${destination}&date=${departureDate}`)
-
-;
-        const flights = await response.json();
-
-        if (flights.length === 0) {
-            alert("Không tìm thấy chuyến bay phù hợp.");
-             // return statement to exit the function
-            return;
+        function bookFlight() {
+            let departure = document.getElementById('departure').value;
+            let destination = document.getElementById('destination').value;
+            let departureDate = document.getElementById('departure-date').value;
+            let returnDate = document.getElementById('return-date').value;
+            let passengers = document.getElementById('passenger-count').value;
+            
+            if (!departure || !destination || !departureDate) {
+                alert("Vui lòng nhập đầy đủ thông tin chuyến bay.");
+                return;
+            }
+            
+            alert(`Đang tìm chuyến bay từ ${departure} đến ${destination} vào ngày ${departureDate}${returnDate ? ", khứ hồi ngày " + returnDate : ""}. Số hành khách: ${passengers}`);
         }
-
-        const flight = flights[0];
-        alert(`Tìm thấy chuyến bay: ${flight._id}, giá: ${flight.price}, giờ khởi hành: ${new Date(flight.departure.time).toLocaleString()}`);
-        
-        // Tùy bạn: có thể mở form đặt vé, hoặc chuyển trang tiếp theo tại đây
-
-    } catch (error) {
-        console.error('Lỗi khi tìm chuyến bay:', error);
-        alert("Đã xảy ra lỗi khi tìm chuyến bay.");
-    }
-}
-
     </script>
 </body>
 </html>

@@ -1,51 +1,43 @@
 const express = require('express');
 const router = express.Router();
-const Hotel = require('../models/Hotel');
+const Flight = require('../models/Flight');
 const Booking = require('../models/Booking');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-// Hotel search endpoint
+// Flight search endpoint
 router.get('/search', async (req, res) => {
     try {
-        const { location, checkinDate, checkoutDate, rooms } = req.query;
-
-        // Parse checkinDate and checkoutDate to ensure valid range
-        const checkin = new Date(checkinDate);
-        const checkout = new Date(checkoutDate);
-
-        if (checkout <= checkin) {
-            return res.status(400).json({ message: 'Ngày trả phòng phải lớn hơn ngày nhận phòng' });
-        }
-
-        const hotels = await Hotel.find({
-            'location.city': { $regex: location, $options: 'i' },
-            'rooms.availability': { $gte: rooms },  // Ensure there are enough available rooms
-            'availableDates': { $gte: checkin, $lte: checkout }
+        const { departure, arrival, date } = req.query;
+        
+        const flights = await Flight.find({
+            'departure.city': { $regex: departure, $options: 'i' },
+            'arrival.city': { $regex: arrival, $options: 'i' },
+            'departure.time': {
+                $gte: new Date(date),
+                $lt: new Date(new Date(date).setDate(new Date(date).getDate() + 1))
+            },
+            status: 'scheduled'
         });
 
-        if (hotels.length === 0) {
-            return res.status(404).json({ message: 'Không tìm thấy khách sạn phù hợp' });
-        }
-
-        res.json(hotels);
+        res.json(flights);
     } catch (error) {
-        console.error('Hotel search error:', error);
-        res.status(500).json({ message: 'Có lỗi xảy ra khi tìm kiếm khách sạn. Vui lòng thử lại sau.' });
+        console.error('Flight search error:', error);
+        res.status(500).json({ message: 'Có lỗi xảy ra khi tìm kiếm chuyến bay. Vui lòng thử lại sau.' });
     }
 });
 
-// Hotel booking endpoint
+// Flight booking endpoint
 router.post('/book', async (req, res) => {
     try {
-        const { hotelId, checkinDate, checkoutDate, roomType, rooms } = req.body;
+        const { flightId, passengers, class: flightClass, seats } = req.body;
         const token = req.headers.authorization?.split(' ')[1];
 
         if (!token) {
-            return res.status(401).json({ message: 'Vui lòng đăng nhập để đặt phòng' });
+            return res.status(401).json({ message: 'Vui lòng đăng nhập để đặt vé' });
         }
 
-        // Xác thực token
+        // Verify token and get user
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await User.findById(decoded.userId);
 
@@ -53,50 +45,46 @@ router.post('/book', async (req, res) => {
             return res.status(401).json({ message: 'Người dùng không tồn tại' });
         }
 
-        // Lấy thông tin khách sạn
-        const hotel = await Hotel.findById(hotelId);
-        if (!hotel) {
-            return res.status(404).json({ message: 'Khách sạn không tồn tại' });
+        // Get flight details
+        const flight = await Flight.findById(flightId);
+        if (!flight) {
+            return res.status(404).json({ message: 'Chuyến bay không tồn tại' });
         }
 
-        // Kiểm tra xem có đủ phòng còn trống không
-        const room = hotel.rooms.find(r => r.type === roomType);
-        if (!room || room.available < rooms) {
-            return res.status(400).json({ message: 'Không đủ phòng trống' });
-        }
+        // Calculate total amount based on class
+        const priceMultiplier = {
+            'economy': 1,
+            'business': 2,
+            'first': 3
+        };
+        const totalAmount = flight.price * priceMultiplier[flightClass] * passengers.length;
 
-        // Tính tổng số tiền
-        const totalAmount = room.price * rooms;
-
-        // Tạo đơn đặt phòng
+        // Create booking
         const booking = new Booking({
             user: user._id,
-            type: 'hotel',
+            type: 'flight',
             status: 'pending',
             totalAmount,
             paymentStatus: 'pending',
-            hotel: {
-                hotel: hotelId,
-                checkinDate,
-                checkoutDate,
-                rooms: [{ type: roomType, quantity: rooms }]
+            paymentMethod: 'credit_card', // Default payment method
+            flight: {
+                flight: flightId,
+                passengers,
+                class: flightClass,
+                seats
             }
         });
 
         await booking.save();
 
-        // Update room availability
-        room.available -= rooms;
-        await hotel.save();
-
         res.status(201).json({
-            message: 'Đặt phòng thành công',
+            message: 'Đặt vé thành công',
             booking
         });
     } catch (error) {
-        console.error('Hotel booking error:', error);
-        res.status(500).json({ message: 'Có lỗi xảy ra khi đặt phòng. Vui lòng thử lại sau.' });
+        console.error('Flight booking error:', error);
+        res.status(500).json({ message: 'Có lỗi xảy ra khi đặt vé. Vui lòng thử lại sau.' });
     }
 });
 
-module.exports = router;
+module.exports = router; 

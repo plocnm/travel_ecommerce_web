@@ -41,6 +41,8 @@ const userSchema = new mongoose.Schema({
         default: Date.now
     },
     verificationCode: String,   
+    resetPasswordCode: String,
+ //   resetCodeExpiry: Date,
 });
 
 userSchema.pre('save', async function (next) {

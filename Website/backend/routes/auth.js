@@ -95,4 +95,55 @@ router.post('/verify', async (req, res) => {
     res.json({ message: 'Xác minh thành công. Bạn có thể đăng nhập.' });
 });
 
+const nodemailer = require('nodemailer'); // nếu chưa có
+const crypto = require('crypto');
+
+// Quên mật khẩu
+router.post('/forgot-password', async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: 'Không tìm thấy người dùng với email này.' });
+        }
+
+        const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+        user.resetPasswordCode = resetCode;
+        user.resetCodeExpiry = Date.now() + 10 * 60 * 1000; // 10 phút
+        await user.save();
+
+        // Gửi email chứa mã
+        await sendVerificationEmail(user.email, resetCode); // dùng lại hàm gửi mã
+
+        res.json({ message: 'Đã gửi mã đặt lại mật khẩu đến email của bạn.' });
+    } catch (error) {
+        console.error('Forgot password error:', error);
+        res.status(500).json({ message: 'Lỗi máy chủ.' });
+    }
+});
+
+router.post('/reset-password', async (req, res) => {
+    const { email, code, newPassword } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user || user.resetPasswordCode !== code) {
+            return res.status(400).json({ message: 'Mã không đúng hoặc đã hết hạn.' });
+        }
+
+        user.password = newPassword;
+        user.resetPasswordCode = null;
+        user.resetCodeExpiry = null;
+        await user.save();
+
+        res.json({ message: 'Đặt lại mật khẩu thành công.' });
+    } catch (error) {
+        console.error('Reset password error:', error);
+        res.status(500).json({ message: 'Lỗi máy chủ.' });
+    }
+});
+
 module.exports = router;

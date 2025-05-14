@@ -42,8 +42,11 @@ app.use((req, res, next) => {
 // Serve static files from the frontend directory
 app.use(express.static(path.join(__dirname, '../frontend')));
 
+// Serve images directly from the images directory within frontend
+app.use('/images', express.static(path.join(__dirname, '../frontend/images')));
+
 // Update the static file serving to include the Website root directory
-app.use(express.static(path.join(__dirname, '../..')));
+// app.use(express.static(path.join(__dirname, '../..'))); // Commented out this line
 
 // Add this after other static middleware
 app.use('/admin', express.static(path.join(__dirname, '../admin')));

@@ -34,94 +34,8 @@
     
     <h3>Đặt Combo Du Lịch Với Giá Ưu Đãi Ngay</h3>
    
-    <section class="combo-container">
-        
-        <div class="tour-card">
-            <img src="images/halong-bay.png" alt="Tour Hạ Long">
-            <div class="tour-info">
-                <h3>COMBO1</h3>
-                <p>3 ngày 2 đêm</p>
-                <p><strong>Vé Máy Bay + Trọn Gói Dịch Vụ</strong></p>
-                <p>Tour Hạ Long trọn gói 3 Ngày 2 Đêm</p>
-                <p class="price">2.299.000 VND</p>
-            </div>
-        </div>
-
-        <div class="tour-card">
-            <img src="images/sapa.png" alt="Tour Sapa">
-            <div class="tour-info">
-                <h3>COMBO2</h3>
-                <p>4 ngày 3 đêm</p>
-                <p><strong>Vé Máy Bay + Trọn Gói Dịch Vụ</strong></p>
-                <p>Tour SaPa trọn gói 4 Ngày 3 Đêm</p>
-                <p class="price">3.299.000 VND</p>
-            </div>
-        </div>
-
-        <div class="tour-card">
-            <img src="images/nhatrang.png" alt="Tour Nha Trang">
-            <div class="tour-info">
-                <h3>COMBO3</h3>
-                <p>3 ngày 2 đêm</p>
-                <p><strong>Vé Máy Bay + Trọn Gói Dịch Vụ</strong></p>
-                <p>Tour Nha Trang trọn gói 3 Ngày 2 Đêm</p>
-                <p class="price">2.999.000 VND</p>
-            </div>
-        </div>
-
-        <div class="tour-card">
-            <img src="images/taynguyen.png" alt="Tour Tây Nguyên">
-            <div class="tour-info">
-                <h3>COMBO4</h3>
-                <p>3 ngày 2 đêm</p>
-                <p><strong>Vé Máy Bay + Trọn Gói Dịch Vụ</strong></p>
-                <p>Tour Tây Nguyên trọn gói 3N2Đ + Teambuilding + Gala Dinner</p>
-                <p class="price">3.499.000 VND</p>
-            </div>
-        </div>
-        <div class="tour-card">
-            <img src="images/halong-bay.png" alt="Tour Hạ Long">
-            <div class="tour-info">
-                <h3>COMBO1</h3>
-                <p>3 ngày 2 đêm</p>
-                <p><strong>Vé Máy Bay + Trọn Gói Dịch Vụ</strong></p>
-                <p>Tour Hạ Long trọn gói 3 Ngày 2 Đêm</p>
-                <p class="price">2.299.000 VND</p>
-            </div>
-        </div>
-
-        <div class="tour-card">
-            <img src="images/sapa.png" alt="Tour Sapa">
-            <div class="tour-info">
-                <h3>COMBO2</h3>
-                <p>4 ngày 3 đêm</p>
-                <p><strong>Vé Máy Bay + Trọn Gói Dịch Vụ</strong></p>
-                <p>Tour SaPa trọn gói 4 Ngày 3 Đêm</p>
-                <p class="price">3.299.000 VND</p>
-            </div>
-        </div>
-
-        <div class="tour-card">
-            <img src="images/nhatrang.png" alt="Tour Nha Trang">
-            <div class="tour-info">
-                <h3>COMBO3</h3>
-                <p>3 ngày 2 đêm</p>
-                <p><strong>Vé Máy Bay + Trọn Gói Dịch Vụ</strong></p>
-                <p>Tour Nha Trang trọn gói 3 Ngày 2 Đêm</p>
-                <p class="price">2.999.000 VND</p>
-            </div>
-        </div>
-
-        <div class="tour-card">
-            <img src="images/taynguyen.png" alt="Tour Tây Nguyên">
-            <div class="tour-info">
-                <h3>COMBO4</h3>
-                <p>3 ngày 2 đêm</p>
-                <p><strong>Vé Máy Bay + Trọn Gói Dịch Vụ</strong></p>
-                <p>Tour Tây Nguyên trọn gói 3N2Đ + Teambuilding + Gala Dinner</p>
-                <p class="price">3.499.000 VND</p>
-            </div>
-        </div>
+    <section class="combo-container" id="combo-container-index">
+        <!-- Tour cards will be dynamically loaded here -->
     </section>
     
     <h4>
@@ -179,5 +93,59 @@
         </footer>
         
    
+    <script>
+        // Fetch and display tours for index.html
+        async function loadIndexTours() {
+            try {
+                const response = await fetch('/api/tours'); // Assuming the API is accessible at this path
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const tours = await response.json();
+                const comboContainer = document.getElementById('combo-container-index');
+                comboContainer.innerHTML = ''; // Clear existing static content
+
+                if (tours.length === 0) {
+                    comboContainer.innerHTML = '<p>Hiện tại không có tour nào.</p>';
+                    return;
+                }
+
+                tours.forEach(tour => {
+                    const tourCard = document.createElement('div');
+                    tourCard.classList.add('tour-card');
+                    // It seems index.html doesn't link to tour_details.html in the static version.
+                    // If you want to add links, uncomment the next lines and ensure tour._id is available.
+                    /*
+                    tourCard.onclick = () => {
+                        window.location.href = `tour_details.html?id=${tour._id}`;
+                    };
+                    */
+
+                    const imageUrl = tour.images && tour.images.length > 0 ? tour.images[0] : 'images/default-tour.png';
+                    const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(tour.price);
+
+                    tourCard.innerHTML = `
+                        <img src="${imageUrl}" alt="${tour.name}">
+                        <div class="tour-info">
+                            <h3>${tour.name.toUpperCase()}</h3>
+                            <p>${tour.duration.days} ngày ${tour.duration.nights} đêm</p>
+                            <p><strong>${tour.destination}</strong></p>
+                            <p>${tour.description ? tour.description.substring(0, 100) + '...' : 'Mô tả đang được cập nhật'}</p>
+                            <p class="price">${formattedPrice}</p>
+                        </div>
+                    `;
+                    comboContainer.appendChild(tourCard);
+                });
+            } catch (error) {
+                console.error('Failed to load tours for index page:', error);
+                const comboContainer = document.getElementById('combo-container-index');
+                comboContainer.innerHTML = '<p>Lỗi khi tải danh sách tour. Vui lòng thử lại sau.</p>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadIndexTours(); // Load tours when DOM is ready
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt Vé Máy Bay</title>
+    <link rel="stylesheet" href="booking styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Đặt Vé Máy Bay</h1>
+        
+        <div class="card" id="flight-booking-section">
+            <h2>Thông tin chuyến bay</h2>
+            <input type="text" placeholder="Điểm đi" id="departure">
+            <input type="text" placeholder="Điểm đến" id="destination">
+            <input type="date" placeholder="Ngày đi" id="departure-date">
+            <input type="date" placeholder="Ngày về (nếu có)" id="return-date">
+            <select id="passenger-count" title="Số hành khách">
+                <option value="1">1 hành khách</option>
+                <option value="2">2 hành khách</option>
+                <option value="3">3 hành khách</option>
+                <option value="4">4 hành khách</option>
+                <option value="5">45 hành khách</option>
+                <option value="6">6 hành khách</option>
+                <option value="7">7 hành khách</option>
+                <option value="8">8 hành khách</option>
+                <option value="9">9 hành khách</option>
+                <option value="10">10 hành khách</option>
+            </select>
+            <label for="class-type">Hạng vé:</label>
+                <select id="class-type">
+                    <option value="economy">Phổ thông</option>
+                    <option value="business">Thương gia</option>
+                    <option value="first-class">Hạng nhất</option>
+                </select>
+            <button onclick="bookFlight()">Tìm chuyến bay</button>
+        </div>
+        
+        <p><a href="#" onclick="navigateHome()">Quay lại trang chủ</a> | <a href="hotel_booking.html">Đặt khách sạn</a></p>
+    </div>
+    
+    <script>
+        // Check login status and handle navigation
+        function navigateHome() {
+            const userToken = localStorage.getItem('userToken');
+            if (userToken) {
+                window.location.href = 'Home page.HTML';
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Check login status when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const userToken = localStorage.getItem('userToken');
+            if (!userToken) {
+                window.location.href = 'login.html';
+            }
+        });
+
+        function bookFlight() {
+            let departure = document.getElementById('departure').value;
+            let destination = document.getElementById('destination').value;
+            let departureDate = document.getElementById('departure-date').value;
+            let returnDate = document.getElementById('return-date').value;
+            let passengers = document.getElementById('passenger-count').value;
+            
+            if (!departure || !destination || !departureDate) {
+                alert("Vui lòng nhập đầy đủ thông tin chuyến bay.");
+                return;
+            }
+            
+            alert(`Đang tìm chuyến bay từ ${departure} đến ${destination} vào ngày ${departureDate}${returnDate ? ", khứ hồi ngày " + returnDate : ""}. Số hành khách: ${passengers}`);
+        }
+    </script>
+</body>
+</html>

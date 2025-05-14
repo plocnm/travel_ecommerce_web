@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt Khách Sạn</title>
+    <link rel="stylesheet" href="booking styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Đặt Khách Sạn</h1>
+        
+        <div class="card" id="hotel-booking-section">
+            <h2>Thông tin khách sạn</h2>
+            <div class="search-container">
+                <input type="text" 
+                       placeholder="Thành phố / Địa điểm" 
+                       id="location" 
+                       list="location-suggestions"
+                       autocomplete="off">
+                <datalist id="location-suggestions">
+                    <option value="Hạ Long">
+                    <option value="SaPa">
+                    <option value="Nha Trang">
+                    <option value="Buôn Ma Thuột">
+                </datalist>
+            </div>
+            <input type="date" placeholder="Ngày nhận phòng" id="checkin-date">
+            <input type="date" placeholder="Ngày trả phòng" id="checkout-date">
+            <select id="room-count" title="Số phòng cần đặt">
+                <option value="1">1 phòng</option>
+                <option value="2">2 phòng</option>
+                <option value="3">3 phòng</option>
+                <option value="4">4 phòng</option>
+            </select>
+            <button onclick="searchHotels()">Tìm khách sạn</button>
+        </div>
+
+        <div id="hotel-results" class="card" style="display: none;">
+            <h2>Kết quả tìm kiếm</h2>
+            <div id="hotels-list"></div>
+        </div>
+        
+        <p><a href="#" onclick="navigateHome()">Quay lại trang chủ</a> | <a href="flight_booking.html">Đặt vé máy bay</a></p>
+    </div>
+    
+    <script>
+        // Check login status and handle navigation
+        function navigateHome() {
+            const userToken = localStorage.getItem('userToken');
+            if (userToken) {
+                window.location.href = 'Home page.HTML';
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Check login status when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const userToken = localStorage.getItem('userToken');
+            if (!userToken) {
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Set minimum date for check-in and check-out to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('checkin-date').min = today;
+        document.getElementById('checkout-date').min = today;
+
+        // Update checkout date minimum when checkin date changes
+        document.getElementById('checkin-date').addEventListener('change', function() {
+            document.getElementById('checkout-date').min = this.value;
+            if (document.getElementById('checkout-date').value < this.value) {
+                document.getElementById('checkout-date').value = this.value;
+            }
+        });
+
+        function normalizeVietnamese(str) {
+            return str
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase();
+        }
+
+        async function searchHotels() {
+            const location = document.getElementById('location').value;
+            const checkinDate = document.getElementById('checkin-date').value;
+            const checkoutDate = document.getElementById('checkout-date').value;
+            const rooms = document.getElementById('room-count').value;
+            
+            if (!location || !checkinDate || !checkoutDate) {
+                alert("Vui lòng nhập đầy đủ thông tin khách sạn.");
+                return;
+            }
+
+            // Show loading state
+            const resultsSection = document.getElementById('hotel-results');
+            const hotelsList = document.getElementById('hotels-list');
+            hotelsList.innerHTML = '<p>Đang tìm kiếm khách sạn...</p>';
+            resultsSection.style.display = 'block';
+
+            try {
+                const response = await fetch(`http://localhost:5500/api/hotels/search?location=${encodeURIComponent(location)}&checkinDate=${checkinDate}&checkoutDate=${checkoutDate}&rooms=${rooms}`);
+                const hotels = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(hotels.message || 'Có lỗi xảy ra khi tìm kiếm khách sạn');
+                }
+
+                displayHotels(hotels);
+            } catch (error) {
+                hotelsList.innerHTML = `<p class="error">${error.message}</p>`;
+            }
+        }
+
+        function displayHotels(hotels) {
+            const resultsSection = document.getElementById('hotel-results');
+            const hotelsList = document.getElementById('hotels-list');
+            
+            if (hotels.length === 0) {
+                hotelsList.innerHTML = '<p>Không tìm thấy khách sạn phù hợp.</p>';
+                resultsSection.style.display = 'block';
+                return;
+            }
+
+            hotelsList.innerHTML = hotels.map(hotel => `
+                <div class="hotel-card">
+                    <h3>${hotel.name}</h3>
+                    <p><strong>Địa chỉ:</strong> ${hotel.location.address}</p>
+                    <p><strong>Đánh giá:</strong> ${hotel.rating}/5</p>
+                    <p><strong>Tiện nghi:</strong> ${hotel.amenities.join(', ')}</p>
+                    <div class="room-types">
+                        ${hotel.rooms.map(room => `
+                            <div class="room-type">
+                                <h4>${getRoomTypeName(room.type)}</h4>
+                                <p>Giá: ${formatPrice(room.price)} VNĐ/đêm</p>
+                                <p>Sức chứa: ${room.capacity} người</p>
+                                <p>Còn trống: ${room.available} phòng</p>
+                                <button onclick="bookRoom('${hotel._id}', '${room.type}')">Đặt phòng</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            resultsSection.style.display = 'block';
+        }
+
+        function getRoomTypeName(type) {
+            const types = {
+                'single': 'Phòng đơn',
+                'double': 'Phòng đôi',
+                'suite': 'Suite',
+                'deluxe': 'Phòng Deluxe'
+            };
+            return types[type] || type;
+        }
+
+        function formatPrice(price) {
+            return price.toLocaleString('vi-VN');
+        }
+
+        async function bookRoom(hotelId, roomType) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Vui lòng đăng nhập để đặt phòng');
+                return;
+            }
+
+            const checkinDate = document.getElementById('checkin-date').value;
+            const checkoutDate = document.getElementById('checkout-date').value;
+            const rooms = document.getElementById('room-count').value;
+
+            try {
+                const response = await fetch('http://localhost:5500/api/hotels/book', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        hotelId,
+                        checkinDate,
+                        checkoutDate,
+                        rooms: [{
+                            type: roomType,
+                            quantity: parseInt(rooms),
+                            guests: [] // This should be filled with actual guest information
+                        }]
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Có lỗi xảy ra khi đặt phòng');
+                }
+
+                alert('Đặt phòng thành công!');
+                // Redirect to booking confirmation page or show booking details
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+    </script>
+</body>
+</html>

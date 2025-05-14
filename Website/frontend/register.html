@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Ký</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Đăng Ký Tài Khoản</h1>
+        
+        <div class="card" id="register-section">
+            <h2>Đăng Ký</h2>
+            <input type="text" placeholder="Họ và tên" id="register-name">
+            <input type="email" placeholder="Email" id="register-email">
+            <input type="tel" placeholder="Số điện thoại" id="register-phone">
+            <input type="password" placeholder="Mật khẩu" id="register-password">
+            <input type="password" placeholder="Xác nhận mật khẩu" id="confirm-password">
+            <button onclick="register()">Hoàn tất Đăng Ký</button>
+        </div>
+        
+        <p>Đã có tài khoản? <a href="login.html">Đăng nhập</a></p>
+    </div>
+    
+    <script>
+        // API configuration
+        const API_URL = 'http://127.0.0.1:3001';
+
+        async function register() {
+            let name = document.getElementById('register-name').value;
+            let email = document.getElementById('register-email').value;
+            let phone = document.getElementById('register-phone').value;
+            let password = document.getElementById('register-password').value;
+            let confirmPassword = document.getElementById('confirm-password').value;
+            
+            // Validate inputs
+            if (!name || !email || !phone || !password || !confirmPassword) {
+                alert("Vui lòng điền đầy đủ thông tin.");
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert("Mật khẩu xác nhận không khớp. Vui lòng thử lại.");
+                return;
+            }
+
+            try {
+                console.log('Sending registration request to:', `${API_URL}/api/register`);
+                const response = await fetch(`${API_URL}/api/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name,
+                        email,
+                        phone,
+                        password
+                    })
+                });
+
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Có lỗi xảy ra khi đăng ký');
+                }
+
+                // Store token in localStorage
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+
+                alert('Đăng ký thành công!');
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Registration error:', error);
+                if (error.message === 'Failed to fetch') {
+                    alert('Không thể kết nối đến máy chủ. Vui lòng kiểm tra:\n1. Máy chủ đang chạy\n2. Đường dẫn API đúng\n3. Không có lỗi CORS');
+                } else {
+                    alert(error.message);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

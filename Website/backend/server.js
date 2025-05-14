@@ -8,6 +8,14 @@ const errorHandler = require('./middlewares/error.middleware');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 
+// Configuration for backend
+const config = {
+    backend: {
+        port: 5500,
+        path: __dirname
+    }
+};
+
 // Khởi tạo app
 const app = express();
 connectDB();
@@ -28,13 +36,15 @@ app.get('/', (req, res) => {
   res.send('Welcome to the Travel E-commerce API!');
 });
 
-// Mount các route
+// Mount các route (temporarily commented out for debugging)
+/*
 app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/users', require('./routes/user.routes'));
 app.use('/api/flights', require('./routes/flight.routes'));
 app.use('/api/hotels', require('./routes/hotel.routes'));
 app.use('/api/tours', require('./routes/tour.routes'));
 app.use('/api/bookings', require('./routes/booking.routes'));
+*/
 
 // Fallback route to serve index.html for unmatched routes
 app.get('*', (req, res) => {
@@ -44,8 +54,9 @@ app.get('*', (req, res) => {
 // Middleware xử lý lỗi cuối cùng
 app.use(errorHandler);
 
-// Khởi động server
-const PORT = process.env.PORT || 5500;
+// Start the backend server as usual
+const PORT = process.env.PORT || config.backend.port;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`🚀 Backend running on http://localhost:${PORT}`);
+    console.log(`Frontend served from the same port, accessible at http://localhost:${PORT}/index.HTML or other frontend paths.`);
 });

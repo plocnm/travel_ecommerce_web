@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Xác Thực Email</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+    <h1>Xác Thực Email</h1>
+    <input type="email" placeholder="Nhập email" id="email">
+    <input type="text" placeholder="Nhập mã xác thực" id="code">
+    <button onclick="verify()">Xác Thực</button>
+</div>
+
+<script>
+    const API_URL = 'http://localhost:5500';
+
+    async function verify() {
+        const email = document.getElementById('email').value;
+        const code = document.getElementById('code').value;
+
+        try {
+            const res = await fetch(`${API_URL}/api/auth/verify`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, code })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message);
+            alert('Xác thực thành công! Vui lòng đăng nhập.');
+            window.location.href = 'login.html';
+
+        } catch (err) {
+            alert('Lỗi xác thực: ' + err.message);
+        }
+    }
+</script>
+</body>
+</html>

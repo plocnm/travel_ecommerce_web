@@ -2,35 +2,30 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const sendVerificationEmail = require('../models/sendVerificationEmail'); // Đường dẫn đúng đến file gửi email
 
-// Login route
+// Đăng nhập
 router.post('/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
+try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
 
-        // Find user by email
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(401).json({ message: 'Email hoặc mật khẩu không chính xác' });
-        }
+    if (!user || !(await user.comparePassword(password))) {
+        return res.status(401).json({ message: 'Email hoặc mật khẩu không chính xác' });
+    }
+    if (!user.isVerified) {
+        return res.status(403).json({ message: 'Tài khoản chưa được xác thực qua email.' });
+    }
 
-        // Check password
-        const isMatch = await user.comparePassword(password);
-        if (!isMatch) {
-            return res.status(401).json({ message: 'Email hoặc mật khẩu không chính xác' });
-        }
+    const token = jwt.sign(
+        { userId: user._id, email: user.email, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: '24h' }
+    );
 
-        // Create JWT token
-        const token = jwt.sign(
-            { userId: user._id, email: user.email, role: user.role },
-            process.env.JWT_SECRET,
-            { expiresIn: '24h' }
-        );
-
-        // Send response
-        res.json({
-            token,
-            user: {
+    res.json({
+        token,
+        user: {
                 id: user._id,
                 name: user.name,
                 email: user.email,
@@ -43,47 +38,37 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// Register route
+
+// Đăng ký (kèm xác thực email)
 router.post('/register', async (req, res) => {
-    console.log('Registration request received:', req.body);
+    const generateCode = () => Math.floor(100000 + Math.random() * 900000).toString();
+
+// Tạo mã xác thực
+     const code = generateCode();
     try {
         const { name, email, phone, password } = req.body;
 
-        // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            console.log('Email already exists:', email);
             return res.status(400).json({ message: 'Email đã được sử dụng' });
         }
 
-        // Create new user
-        const user = new User({
-            name,
-            email,
-            phone,
-            password
-        });
-
+        const verificationCode = code;
+        const user = new User({ name, email, phone, password,verificationCode,isVerified: false });
         await user.save();
-        console.log('User created successfully:', email);
 
-        // Create JWT token
-        const token = jwt.sign(
-            { userId: user._id, email: user.email, role: user.role },
-            process.env.JWT_SECRET,
-            { expiresIn: '24h' }
-        );
+        // Tạo token xác thực email
+        // const emailToken = jwt.sign(
+        //     { code },
+        //  //   process.env.JWT_SECRET,
+        // );
+        user.verificationCode = code;
 
-        // Send response
+        // Gửi email xác thực
+        await sendVerificationEmail(user.email, code);
+
         res.status(201).json({
-            message: 'Đăng ký thành công',
-            token,
-            user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role
-            }
+            message: 'Đăng ký thành công. Vui lòng kiểm tra email để xác thực.'
         });
     } catch (error) {
         console.error('Registration error:', error);
@@ -91,4 +76,23 @@ router.post('/register', async (req, res) => {
     }
 });
 
-module.exports = router; 
+router.post('/verify', async (req, res) => {
+    const { email, code } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
+    }
+
+    if (user.verificationCode !== code) {
+        return res.status(400).json({ message: 'Mã xác minh không đúng.' });
+    }
+
+    user.isVerified = true;
+    user.verificationCode = null; // Xoá mã sau khi xác minh
+    await user.save();
+
+    res.json({ message: 'Xác minh thành công. Bạn có thể đăng nhập.' });
+});
+
+module.exports = router;

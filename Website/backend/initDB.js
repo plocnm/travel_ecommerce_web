@@ -36,7 +36,10 @@ const initializeDB = async () => {
                 email: 'john@example.com',
                 password: 'user123',
                 phone: '9876543210',
-                role: 'user'
+                role: 'user',
+                isVerified: true,
+                verificationCode: null
+
             }
         ]);
 

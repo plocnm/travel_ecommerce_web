@@ -86,12 +86,33 @@
             window.location.href = 'Home page.HTML';
         }
 
-        function forgotPassword() {
-            let email = prompt("Nhập email của bạn để đặt lại mật khẩu:");
-            if (email) {
-                alert(`Một liên kết đặt lại mật khẩu đã được gửi đến ${email}`);
-            }
+        async function forgotPassword() {
+    const email = prompt("Nhập email của bạn để đặt lại mật khẩu:");
+
+    if (!email) return;
+
+    try {
+        const response = await fetch('http://localhost:5500/api/auth/forgot-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            alert(data.message || "Hãy kiểm tra email để đặt lại mật khẩu.");
+            window.location.href = 'resetpass.html';
+        } else {
+            alert(data.message || "Không tìm thấy người dùng.");
         }
+    } catch (error) {
+        console.error('Lỗi khi gửi yêu cầu quên mật khẩu:', error);
+        alert("Có lỗi xảy ra. Vui lòng thử lại sau.");
+    }
+}
+
     </script>
 </body>
 </html>

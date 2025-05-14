@@ -60,10 +60,11 @@
                 <h1>Quản lý đơn đặt</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <div class="input-group">
-                        <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm đơn đặt...">
-                        <button class="btn btn-outline-secondary" type="button" id="refreshBtn" title="Làm mới danh sách">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search orders...">
+                        <button class="btn btn-outline-secondary" type="button" id="refreshBtn" title="Refresh list">
                             <i class="fas fa-sync-alt"></i>
                         </button>
+                    </div>
                 </div>
             </div>
 
@@ -77,9 +78,9 @@
                             <th>Loại dịch vụ</th>
                             <th>Ngày đặt</th>
                             <th>Tổng tiền</th>
-                            <th>Trạng thái thanh toán</th>
-                            <th>Trạng thái đơn</th>
-                            <th>Thao tác</th>
+                            <th>Status</th>
+                            <th>Payment Status</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="ordersTableBody">
@@ -91,7 +92,7 @@
             <!-- Loading Spinner -->
             <div id="loadingSpinner" class="text-center d-none">
                 <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Đang tải...</span>
+                    <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
 
@@ -106,26 +107,26 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Cập nhật trạng thái đơn</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" title="Đóng"></button>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" title="Đóng"></button>
+                    <h5 class="modal-title">Update Order Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" title="Close"></button>
+                </div>
                 <div class="modal-body">
                     <form id="updateStatusForm">
                         <input type="hidden" id="orderIdInput">
                         <div class="mb-3">
-                            <label for="statusSelect" class="form-label">Trạng thái mới</label>
+                            <label for="statusSelect" class="form-label">New Status</label>
                             <select class="form-select" id="statusSelect" required>
-                                <option value="pending">Chờ xử lý</option>
-                                <option value="confirmed">Đã xác nhận</option>
-                                <option value="completed">Hoàn thành</option>
-                                <option value="cancelled">Đã hủy</option>
+                                <option value="pending">Pending</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
                             </select>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                    <button type="button" class="btn btn-primary" id="saveStatusBtn">Lưu thay đổi</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveStatusBtn">Save Changes</button>
                 </div>
             </div>
         </div>

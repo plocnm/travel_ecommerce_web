@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn Hàng Của Tôi</title>
+    <link rel="stylesheet" href="index.css"> </head>
+<body>
+    <header>
+        <h1>
+            <a href="Home page.HTML"> <img src="images/image1.png" alt = "TrungLH Travel" width="120"></a>
+        </h1>
+        <nav>
+            <ul>
+                <li><a href="Home page.HTML">Trang Chủ</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Đơn Hàng Của Tôi</h2>
+        <p>Đây là nơi bạn sẽ thấy danh sách các đơn hàng đã đặt.</p>
+        <div id="orders-container">
+            </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 TrungLH Travel</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const token = localStorage.getItem('userToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Fetch and display orders here in the future
+            const ordersContainer = document.getElementById('orders-container');
+            ordersContainer.innerHTML = '<p>Đang tải đơn hàng...</p>';
+
+            try {
+                const response = await fetch('/api/bookings/my-bookings', { 
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    const responseText = await response.text(); // Get raw response text
+                    let errorMessage = `Lỗi ${response.status} khi tải đơn hàng.`;
+                    try {
+                        // Try to parse as JSON, in case the error is structured
+                        const errorData = JSON.parse(responseText);
+                        errorMessage = errorData.message || errorMessage;
+                    } catch (e) {
+                        // If parsing fails, it means the response was not JSON (e.g., HTML 404 page)
+                        console.error('Server returned non-JSON error response. Body:', responseText);
+                        errorMessage = `Lỗi ${response.status} từ server. Phản hồi không phải là JSON. Xem console để biết chi tiết.`;
+                    }
+                    throw new Error(errorMessage);
+                }
+                
+                const bookings = await response.json(); // If response.ok, expect JSON
+                
+                if (bookings.length === 0) {
+                    ordersContainer.innerHTML = '<p>Bạn chưa có đơn hàng nào.</p>';
+                } else {
+                    renderBookings(bookings, ordersContainer);
+                }
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+                ordersContainer.innerHTML = `<p>Không thể tải danh sách đơn hàng: ${error.message}. Vui lòng thử lại.</p>`;
+            }
+        });
+
+        function renderBookings(bookings, container) {
+            container.innerHTML = ''; // Clear loading message
+            const ul = document.createElement('ul');
+            ul.className = 'bookings-list'; // Add a class for styling
+
+            bookings.forEach(booking => {
+                const li = document.createElement('li');
+                li.className = 'booking-item'; // Add a class for styling
+
+                let detailsHtml = `
+                    <h3>Đơn hàng #${booking._id} (${booking.type})</h3>
+                    <p>Ngày đặt: ${new Date(booking.bookingDate).toLocaleDateString('vi-VN')}</p>
+                    <p>Tổng tiền: ${booking.totalAmount.toLocaleString('vi-VN')} VND</p>
+                    <p>Trạng thái: <span class="status-${booking.status}">${booking.status}</span></p>
+                    <p>Thanh toán: <span class="payment-status-${booking.paymentStatus}">${booking.paymentStatus}</span></p>
+                `;
+
+                if (booking.type === 'flight' && booking.flight && booking.flight.flight) {
+                    const f = booking.flight.flight;
+                    detailsHtml += `
+                        <h4>Chi tiết chuyến bay:</h4>
+                        <p>Chuyến bay: ${f.flightNumber} (${f.airline})</p>
+                        <p>Từ: ${f.departure.city} - Đến: ${f.arrival.city}</p>
+                        <p>Ghế: ${booking.flight.seats.join(', ')} - Hạng: ${booking.flight.class}</p>
+                    `;
+                } else if (booking.type === 'hotel' && booking.hotel && booking.hotel.hotel) {
+                    const h = booking.hotel.hotel;
+                    detailsHtml += `
+                        <h4>Chi tiết khách sạn:</h4>
+                        <p>Khách sạn: ${h.name} (${h.location.city})</p>
+                        <p>Nhận phòng: ${new Date(booking.hotel.checkIn).toLocaleDateString('vi-VN')}</p>
+                        <p>Trả phòng: ${new Date(booking.hotel.checkOut).toLocaleDateString('vi-VN')}</p>
+                    `;
+                } else if (booking.type === 'tour' && booking.tour && booking.tour.tour) {
+                    const t = booking.tour.tour;
+                     detailsHtml += `
+                        <h4>Chi tiết Tour:</h4>
+                        <p>Tour: ${t.name} (${t.destination})</p>
+                    `;
+                }
+                
+                // Add review button for completed and paid bookings
+                if (booking.status === 'completed' || (booking.status === 'confirmed' && booking.paymentStatus === 'paid')) {
+                    detailsHtml += `<button class="review-btn" data-booking-id="${booking._id}">Để lại đánh giá</button>`;
+                }
+
+                li.innerHTML = detailsHtml;
+                ul.appendChild(li);
+            });
+            container.appendChild(ul);
+
+            // Add event listeners for review buttons
+            document.querySelectorAll('.review-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const bookingId = this.dataset.bookingId;
+                    // For now, just log. Later, this will open a review modal.
+                    console.log(`Review button clicked for booking: ${bookingId}`);
+                    alert(`Để lại đánh giá cho đơn hàng ${bookingId} (chức năng đang phát triển)`);
+                });
+            });
+        }
+    </script>
+</body>
+</html> 

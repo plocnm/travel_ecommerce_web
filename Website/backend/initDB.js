@@ -5,6 +5,7 @@ const Flight = require('./models/Flight');
 const Hotel = require('./models/Hotel');
 const Tour = require('./models/Tour');
 const Booking = require('./models/Booking');
+const Review = require('./models/Review');
 
 const initializeDB = async () => {
     try {
@@ -17,7 +18,8 @@ const initializeDB = async () => {
             Flight.deleteMany({}),
             Hotel.deleteMany({}),
             Tour.deleteMany({}),
-            Booking.deleteMany({})
+            Booking.deleteMany({}),
+            Review.deleteMany({})
         ]);
 
         // Create sample users

@@ -72,10 +72,12 @@
                             <tr>
                                 <th>Tour Name</th>
                                 <th>Destination</th>
-                                <th>Duration</th>
+                                <th>Duration (Days/Nights)</th>
                                 <th>Price (VND)</th>
+                                <th>Max Participants</th>
+                                <th>Current Participants</th>
                                 <th>Status</th>
-                                <th>Participants</th>
+                                <th>Rating</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -101,11 +103,15 @@
             <div id="tourModal" class="modal">
                 <div class="modal-content">
                     <span class="close-btn" onclick="closeTourModal()">&times;</span>
-                    <h2 id="modalTitle">Add New Tour</h2>
+                    <h2 id="modalTitle" class="modal-drag-header">Add New Tour</h2>
                     <form id="tourForm" onsubmit="handleTourSubmit(event)">
                         <div class="form-group">
                             <label for="tourName">Tour Name</label>
                             <input type="text" id="tourName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" rows="3" required></textarea>
                         </div>
                         <div class="form-group">
                             <label for="destination">Destination</label>
@@ -118,7 +124,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="durationNights">Nights</label>
-                                <input type="number" id="durationNights" min="1" required>
+                                <input type="number" id="durationNights" min="0" required>
                             </div>
                         </div>
                         <div class="form-group">
@@ -126,12 +132,32 @@
                             <input type="number" id="price" min="0" required>
                         </div>
                         <div class="form-group">
-                            <label for="description">Description</label>
-                            <textarea id="description" rows="4" required></textarea>
+                            <label for="included">Included (comma-separated)</label>
+                            <input type="text" id="included">
+                        </div>
+                        <div class="form-group">
+                            <label for="excluded">Excluded (comma-separated)</label>
+                            <input type="text" id="excluded">
+                        </div>
+                        <div class="form-group">
+                            <label for="itinerary">Itinerary (JSON format: [{"day": 1, "activities": ["Activity 1", "Activity 2"]}])</label>
+                            <textarea id="itinerary" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="images">Images (comma-separated URLs)</label>
+                            <input type="text" id="images">
                         </div>
                         <div class="form-group">
                             <label for="maxParticipants">Max Participants</label>
                             <input type="number" id="maxParticipants" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="departureDates">Departure Dates (JSON format: [{"date": "YYYY-MM-DD", "available": 10}])</label>
+                            <textarea id="departureDates" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="rating">Rating (0-5)</label>
+                            <input type="number" id="rating" min="0" max="5" step="0.1">
                         </div>
                         <div class="form-group">
                             <label for="status">Status</label>

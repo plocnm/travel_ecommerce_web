@@ -7,16 +7,23 @@ const jwt = require('jsonwebtoken');
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
+        console.log(`Login attempt for email: ${email}`);
 
         // Find user by email
         const user = await User.findOne({ email });
         if (!user) {
+            console.log(`User not found for email: ${email}`);
             return res.status(401).json({ message: 'Email hoặc mật khẩu không chính xác' });
         }
 
+        console.log(`User found: ${user.email}, Stored Hashed Password: ${user.password}`);
+
         // Check password
         const isMatch = await user.comparePassword(password);
+        console.log(`Password comparison result (isMatch): ${isMatch}`);
+
         if (!isMatch) {
+            console.log(`Password mismatch for user: ${email}`);
             return res.status(401).json({ message: 'Email hoặc mật khẩu không chính xác' });
         }
 

@@ -355,9 +355,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize draggable modal
     const tourModal = document.getElementById('tourModal');
-    const modalHeader = tourModal.querySelector('.modal-drag-header'); // Use the class we added
-    if (tourModal && modalHeader) {
-        makeModalDraggable(tourModal, modalHeader);
+    if (tourModal) {
+        const modalHeader = tourModal.querySelector('.modal-drag-header');
+        if (modalHeader) {
+            makeModalDraggable(tourModal, modalHeader);
+        }
     }
 });
 
@@ -368,4 +370,112 @@ function debounce(func, delay) {
         clearTimeout(timeout);
         timeout = setTimeout(() => func.apply(context, args), delay);
     };
+}
+
+// Order Management Functions
+async function loadOrders() {
+    const ordersTableBody = document.getElementById('ordersTableBody');
+    const loadingSpinner = document.getElementById('loadingSpinner'); // Assuming you have a spinner with this ID
+    const errorAlert = document.getElementById('errorAlert'); // Assuming you have an error alert with this ID
+
+    if (!ordersTableBody) {
+        console.error('ordersTableBody not found');
+        return;
+    }
+
+    ordersTableBody.innerHTML = ''; // Clear existing rows
+    if(loadingSpinner) loadingSpinner.classList.remove('d-none'); // Use d-none if you use Bootstrap for hidden
+    if(errorAlert) errorAlert.classList.add('d-none');
+
+    try {
+        // FIXME: Update with the correct API endpoint for fetching all orders/bookings
+        const response = await fetch('http://localhost:5500/api/bookings', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('userToken')}`
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+        const orders = await response.json();
+
+        if (orders.length === 0) {
+            ordersTableBody.innerHTML = '<tr><td colspan="8">No orders found.</td></tr>'; // Colspan should match number of columns
+        } else {
+            orders.forEach(order => {
+                const row = ordersTableBody.insertRow();
+                // Ensure user object and name exist, or provide a fallback.
+                const customerName = order.user && order.user.name ? order.user.name : (order.user ? order.user : 'N/A'); 
+                row.innerHTML = `
+                    <td>${order._id}</td>
+                    <td>${customerName}</td> 
+                    <td>${order.type}</td>
+                    <td>${new Date(order.bookingDate).toLocaleDateString()}</td>
+                    <td>${formatPrice(order.totalAmount)}</td>
+                    <td><span class="status-${order.status ? order.status.toLowerCase().replace(' ', '-') : 'unknown'}">${order.status || 'N/A'}</span></td>
+                    <td><span class="payment-status-${order.paymentStatus ? order.paymentStatus.toLowerCase().replace(' ', '-') : 'unknown'}">${order.paymentStatus || 'N/A'}</span></td>
+                    <td class="actions">
+                        <button class="btn btn-sm btn-primary me-2" onclick="editOrder('${order._id}')" title="Edit Order">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteOrder('${order._id}')" title="Delete Order">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+            });
+        }
+    } catch (error) {
+        console.error('Error loading orders:', error);
+        if(errorAlert) {
+            errorAlert.textContent = `Failed to load orders: ${error.message}`;
+            errorAlert.classList.remove('d-none');
+        }
+    } finally {
+        if(loadingSpinner) loadingSpinner.classList.add('d-none');
+    }
+}
+
+function editOrder(orderId) {
+    console.log('Attempting to edit order:', orderId);
+    // TODO: Implement actual edit functionality
+    // This might involve: 
+    // 1. Fetching the specific order details if not already available.
+    // 2. Populating a form or modal with the order data.
+    // 3. Submitting changes to an update API endpoint.
+    alert(`Edit functionality for order ${orderId} is not yet implemented.`);
+}
+
+function deleteOrder(orderId) {
+    console.log('Attempting to delete order:', orderId);
+    // TODO: Implement actual delete functionality
+    // This might involve: 
+    // 1. Showing a confirmation modal.
+    // 2. Sending a DELETE request to the appropriate API endpoint.
+    // 3. Reloading the orders list on success.
+    if (confirm(`Are you sure you want to delete order ${orderId}?`)) {
+        alert(`Delete functionality for order ${orderId} is not yet implemented. // Placeholder for API call`);
+        // Example: Call an API endpoint and then reload
+        // fetch(`/api/orders/${orderId}`, { method: 'DELETE', headers: {'Authorization': `Bearer ${localStorage.getItem('userToken')}`} })
+        // .then(response => response.json())
+        // .then(data => { loadOrders(); showSuccess('Order deleted'); })
+        // .catch(err => { console.error(err); showError('Failed to delete order.'); });
+    }
+}
+
+function setupEventListeners() {
+    console.log('setupEventListeners called. Add specific listeners as needed.');
+    // Example: Add listener for a refresh button if it's common across admin pages
+    const refreshBtn = document.getElementById('refreshBtn');
+    if (refreshBtn && typeof loadOrders === 'function') { // Check if loadOrders exists for context
+        refreshBtn.addEventListener('click', loadOrders);
+    }
+    
+    // Example: Add listener for a search input if common
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput && typeof loadOrders === 'function') { // Check if loadOrders exists for context
+        searchInput.addEventListener('input', debounce(loadOrders, 500)); // Assuming debounce is available
+    }
 }

@@ -11,6 +11,8 @@ const flightRoutes = require('./routes/flights');
 const paymentRoutes = require('./routes/payments');
 const userRoutes = require('./routes/users'); 
 const tourRoutes = require('./routes/tours');
+const bookingRoutes = require('./routes/bookings');
+const reviewRoutes = require('./routes/reviewRoutes');
 
 const app = express();
 
@@ -55,6 +57,8 @@ app.use('/api/flights', flightRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/tours', tourRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 const PORT = process.env.PORT || 5500;
 app.listen(PORT, '0.0.0.0', () => {

@@ -75,6 +75,6 @@ const tourSchema = new mongoose.Schema({
         enum: ['active', 'inactive', 'sold-out'],
         default: 'active'
     }
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Tour', tourSchema); 

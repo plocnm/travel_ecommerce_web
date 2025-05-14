@@ -1,0 +1,333 @@
+/*==============================
+  Reset & Global Settings
+==============================*/
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  background-color: #f7f9fc;
+  color: #333;
+}
+
+/*==============================
+  Header
+==============================*/
+header {
+  background: url('images/image7.png') center/cover no-repeat;
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+header h1 {
+  font-size: 60px;
+  font-weight: bold;
+}
+
+/*==============================
+  Section Container
+==============================*/
+.section {
+  padding: 60px 20px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+/*==============================
+  Intro Section
+==============================*/
+.intro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.intro-text {
+  flex: 1;
+}
+
+.intro-text h2 {
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+
+.intro-text p {
+  margin-bottom: 20px;
+}
+
+.btn {
+  background-color: #ff6b6b;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 6px;
+}
+
+/*==============================
+  Circle Image
+==============================*/
+.circle-img {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.circle-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/*==============================
+  Founder Section
+==============================*/
+.founder {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 40px;
+  margin-top: 60px;
+}
+
+.founder img {
+  width: 150px;
+  border-radius: 100px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.founder div {
+  flex: 1;
+  min-width: 250px;
+}
+
+@media (max-width: 768px) {
+  .founder {
+    flex-direction: column;
+    text-align: center;
+  }
+  .founder div {
+    text-align: justify;
+  }
+}
+
+/*==============================
+  Packages & Testimonial Sections
+==============================*/
+/* Packages General */
+.packages {
+  text-align: center;
+  margin-top: 80px;
+}
+
+/* Testimonial Block */
+.testimonial {
+  margin-top: 80px;
+  padding: 40px;
+  background-color: #fff;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.testimonial p {
+  font-style: italic;
+}
+
+/*------------------------------
+  Our Packages Section
+------------------------------*/
+.our-packages {
+  background-color: #fff;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.banner-img {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 20px;
+  margin-bottom: 40px;
+}
+
+.title-area {
+  margin-bottom: 40px;
+}
+
+.title-area .icon {
+  width: 60px;
+  margin-bottom: 10px;
+}
+
+.tour-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 40px 0;
+}
+
+.stat {
+  text-align: center;
+}
+
+.circle {
+  width: 100px;
+  height: 100px;
+  line-height: 100px;
+  border-radius: 50%;
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+/* Màu sắc cho vòng tròn */
+.circle.blue { background-color: #4da8da; }
+.circle.pink { background-color: #f675a8; }
+.circle.purple { background-color: #a85cf9; }
+
+.international-packages span {
+  color: #f675a8;
+  font-weight: bold;
+}
+
+.international-packages h2 {
+  margin-top: 10px;
+}
+
+/*------------------------------
+  Testimonial Section
+------------------------------*/
+.testimonial-section {
+  background-color: #f9f9f9;
+  padding: 60px 20px;
+  margin-top: 80px;
+  border-radius: 20px;
+  position: relative;
+  text-align: center;
+}
+
+.shell-decor {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+}
+
+.testimonial-title .highlight {
+  color: #f675a8;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.testimonial-box {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 30px;
+  margin-top: 40px;
+  max-width: 600px;
+  margin: 0 auto;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.ceo-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 20px;
+}
+
+blockquote {
+  font-style: italic;
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.ceo-name {
+  font-weight: bold;
+  font-size: 14px;
+  color: #555;
+}
+
+/*==============================
+  Footer
+==============================*/
+footer {
+  background: #fff;
+  padding: 40px 60px;
+  border-top: 1px solid #ddd;
+  text-align: center;
+  font-size: 14px;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-logo img {
+  width: 150px;
+}
+
+.footer-social {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.footer-social a img {
+  width: 24px;
+  height: 24px;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: space-between;
+  flex: 1;
+  margin-left: 50px;
+}
+
+.footer-column {
+  margin-right: 40px;
+}
+
+.footer-column h4 {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.footer-column ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-column ul li {
+  margin-bottom: 8px;
+}
+
+.footer-column ul li a {
+  text-decoration: none;
+  color: black;
+}
+
+.footer-column ul li a:hover {
+  color: #0073e6;
+}

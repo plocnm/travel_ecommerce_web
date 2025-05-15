@@ -60,39 +60,39 @@
         });
 
         async function searchFlights() {
-            const from = document.getElementById('from').value;
-            const to = document.getElementById('to').value;
-            const date = document.getElementById('flight-date').value;
-            const flightClass = document.getElementById('class').value;
+    const from = document.getElementById('from').value;
+    const to = document.getElementById('to').value;
+    const date = document.getElementById('flight-date').value;
+    const flightClass = document.getElementById('class').value;
 
-            if (!from || !to || !date) {
-                alert("Vui lòng nhập đầy đủ thông tin chuyến bay.");
-                return;
-            }
+    if (!from || !to || !date) {
+        alert("Vui lòng nhập đầy đủ thông tin chuyến bay.");
+        return;
+    }
 
-            if(date < new Date().toISOString().split('T')[0]) {
-                alert("Ngày bay không hợp lệ.");
-                return;
-            }
+    if(date < new Date().toISOString().split('T')[0]) {
+        alert("Ngày bay không hợp lệ.");
+        return;
+    }
 
-            const resultsSection = document.getElementById('flight-results');
-            const flightsList = document.getElementById('flights-list');
-            flightsList.innerHTML = '<p>Đang tìm kiếm chuyến bay...</p>';
-            resultsSection.style.display = 'block';
+    const resultsSection = document.getElementById('flight-results');
+    const flightsList = document.getElementById('flights-list');
+    flightsList.innerHTML = '<p>Đang tìm kiếm chuyến bay...</p>';
+    resultsSection.style.display = 'block';
 
-            try {
-                const response = await fetch(`http://localhost:5500/api/flights/search?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${date}&class=${flightClass}`);
-                const flights = await response.json();
+    try {
+        const response = await fetch(`http://localhost:5500/api/flights/search?departure=${encodeURIComponent(from)}&arrival=${encodeURIComponent(to)}&date=${date}&class=${flightClass}`);
+        const flights = await response.json();
 
-                if (!response.ok) {
-                    throw new Error(flights.message || 'Lỗi khi tìm kiếm chuyến bay');
-                }
-
-                displayFlights(flights);
-            } catch (error) {
-                flightsList.innerHTML = `<p class="error">${error.message}</p>`;
-            }
+        if (!response.ok) {
+            throw new Error(flights.message || 'Lỗi khi tìm kiếm chuyến bay');
         }
+
+        displayFlights(flights);
+    } catch (error) {
+        flightsList.innerHTML = `<p class="error">${error.message}</p>`;
+    }
+}
 
         function displayFlights(flights) {
             const flightsList = document.getElementById('flights-list');

@@ -40,7 +40,10 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    verificationCode: String,   
+    verificationCode: {
+        type : String,
+        dèault: null
+    },   
     resetPasswordCode: String,
  //   resetCodeExpiry: Date,
 });

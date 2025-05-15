@@ -9,27 +9,37 @@
 <body>
     <div class="container">
         <h1 class="title">Đặt Vé Máy Bay</h1>
-        
-        <div class="card" id="flight-booking-section">
+
+        <div class="card">
             <h2>Thông tin chuyến bay</h2>
-            <input type="text" placeholder="Điểm đi" id="departure">
-            <input type="text" placeholder="Điểm đến" id="destination">
-            <input type="date" placeholder="Ngày đi" id="departure-date">
-            <input type="date" placeholder="Ngày về (nếu có)" id="return-date">
-            <select id="passenger-count" title="Số hành khách">
-                <option value="1">1 hành khách</option>
-                <option value="2">2 hành khách</option>
-                <option value="3">3 hành khách</option>
-                <option value="4">4 hành khách</option>
+            <div class="search-container">
+                <input type="text" id="from" placeholder="Điểm đi" list="location-suggestions" autocomplete="off">
+                <input type="text" id="to" placeholder="Điểm đến" list="location-suggestions" autocomplete="off">
+                <datalist id="location-suggestions">
+                    <option value="Ho Chi Minh City">
+                    <option value="Hanoi">
+                    <option value="Da Nang">
+                    <option value="Nha Trang">
+                    <option value="Hue">
+                </datalist>
+            </div>
+            <input type="date" id="flight-date">
+            <select id="class">
+                <option value="economy">Phổ thông</option>
+                <option value="business">Thương gia</option>
             </select>
-            <button onclick="bookFlight()">Tìm chuyến bay</button>
+            <button onclick="searchFlights()">Tìm chuyến bay</button>
         </div>
-        
+
+        <div id="flight-results" class="card hidden">
+            <h2>Kết quả tìm kiếm</h2>
+            <div id="flights-list"></div>
+        </div>
+
         <p><a href="#" onclick="navigateHome()">Quay lại trang chủ</a> | <a href="hotel_booking.html">Đặt khách sạn</a></p>
     </div>
-    
+
     <script>
-        // Check login status and handle navigation
         function navigateHome() {
             const userToken = localStorage.getItem('userToken');
             if (userToken) {
@@ -39,27 +49,100 @@
             }
         }
 
-        // Check login status when page loads
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const userToken = localStorage.getItem('userToken');
             if (!userToken) {
                 window.location.href = 'login.html';
             }
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('flight-date').min = today;
         });
 
-        function bookFlight() {
-            let departure = document.getElementById('departure').value;
-            let destination = document.getElementById('destination').value;
-            let departureDate = document.getElementById('departure-date').value;
-            let returnDate = document.getElementById('return-date').value;
-            let passengers = document.getElementById('passenger-count').value;
-            
-            if (!departure || !destination || !departureDate) {
-                alert("Vui lòng nhập đầy đủ thông tin chuyến bay.");
+        async function searchFlights() {
+    const from = document.getElementById('from').value;
+    const to = document.getElementById('to').value;
+    const date = document.getElementById('flight-date').value;
+    const flightClass = document.getElementById('class').value;
+
+    if (!from || !to || !date) {
+        alert("Vui lòng nhập đầy đủ thông tin chuyến bay.");
+        return;
+    }
+
+    if(date < new Date().toISOString().split('T')[0]) {
+        alert("Ngày bay không hợp lệ.");
+        return;
+    }
+
+    const resultsSection = document.getElementById('flight-results');
+    const flightsList = document.getElementById('flights-list');
+    flightsList.innerHTML = '<p>Đang tìm kiếm chuyến bay...</p>';
+    resultsSection.style.display = 'block';
+
+    try {
+        const response = await fetch(`http://localhost:5500/api/flights/search?departure=${encodeURIComponent(from)}&arrival=${encodeURIComponent(to)}&date=${date}&class=${flightClass}`);
+        const flights = await response.json();
+
+        if (!response.ok) {
+            throw new Error(flights.message || 'Lỗi khi tìm kiếm chuyến bay');
+        }
+
+        displayFlights(flights);
+    } catch (error) {
+        flightsList.innerHTML = `<p class="error">${error.message}</p>`;
+    }
+}
+
+        function displayFlights(flights) {
+            const flightsList = document.getElementById('flights-list');
+            if (flights.length === 0) {
+                flightsList.innerHTML = '<p>Không tìm thấy chuyến bay phù hợp.</p>';
                 return;
             }
-            
-            alert(`Đang tìm chuyến bay từ ${departure} đến ${destination} vào ngày ${departureDate}${returnDate ? ", khứ hồi ngày " + returnDate : ""}. Số hành khách: ${passengers}`);
+
+            flightsList.innerHTML = flights.map(flight => `
+                <div class="flight-card">
+                    <h3>${flight.airline} - ${flight.flightNumber}</h3>
+                    <p><strong>Từ:</strong> ${flight.departure.city} (${new Date(flight.departure.time).toLocaleString()})</p>
+                    <p><strong>Đến:</strong> ${flight.arrival.city} (${new Date(flight.arrival.time).toLocaleString()})</p>
+                    <p><strong>Giá:</strong> ${formatPrice(flight.price)} VNĐ</p>
+                    <p><strong>Còn trống:</strong> ${flight.availableSeats} chỗ</p>
+                    <button onclick="bookFlight('${flight._id}')">Đặt vé</button>
+                </div>
+            `).join('');
+        }
+
+        function formatPrice(price) {
+            return price.toLocaleString('vi-VN');
+        }
+
+        async function bookFlight(flightId) {
+            const token = localStorage.getItem('userToken');
+            if (!token) {
+                alert('Vui lòng đăng nhập để đặt vé');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:5500/api/flights/book', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ flightId })
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.message || 'Đặt vé thất bại');
+                }
+
+                alert('Đặt vé thành công!');
+            } catch (error) {
+                alert(error.message);
+            }
         }
     </script>
 </body>

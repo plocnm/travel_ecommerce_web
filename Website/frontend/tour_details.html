@@ -173,56 +173,159 @@
             transform: scale(1.05);
         }
     </style>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .header {
+            background-color: #1ba0e2;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        /* Existing container style */
+        /*
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        */
+        /* New container style from snippet */
+        .container {
+          max-width: 1000px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .cruise-title {
+          font-size: 24px;
+          font-weight: bold;
+          margin-bottom: 15px;
+        }
+        .cruise-rating {
+          color: #f8b400;
+          margin-bottom: 20px;
+        }
+        .main-image {
+          width: 100%;
+          height: 300px;
+          object-fit: cover;
+          border-radius: 8px;
+          margin-bottom: 20px;
+        }
+        .image-gallery {
+          display: flex;
+          gap: 10px;
+          margin-bottom: 20px;
+        }
+        .thumbnail {
+          width: 32%;
+          height: 100px;
+          object-fit: cover;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+        .description { /* Reusing tour-description ID, adding .description class */
+          line-height: 1.6;
+          margin-bottom: 30px;
+        }
+        .booking-box {
+          background-color: #f9f9f9;
+          border-radius: 8px;
+          padding: 20px;
+          margin-bottom: 30px;
+        }
+        .price { /* Reusing tour-price ID, adding .price class */
+          font-size: 28px;
+          font-weight: bold;
+          color: #1ba0e2; /* Using the blue from the snippet header */
+          margin-bottom: 10px;
+        }
+        .per-person {
+          font-size: 14px;
+          color: #666;
+        }
+        .book-button { /* Reusing book-button class */
+          background-color: #ff5e1f; /* Using the orange from the snippet button */
+          color: white;
+          border: none;
+          padding: 12px 30px;
+          font-size: 16px;
+          border-radius: 5px;
+          cursor: pointer;
+          width: 100%;
+          margin-top: 15px;
+        }
+        .details-section { /* Reusing tour-features structure */
+          margin-bottom: 30px;
+        }
+        .details-title { /* Reusing feature-card h4 style */
+          font-size: 18px;
+          font-weight: bold;
+          margin-bottom: 10px;
+        }
+        .itinerary-item { /* Reusing feature-card li style */
+          margin-bottom: 5px;
+        }
+        /* Keeping existing tour-details, tour-header, tour-image, tour-info,
+           feature-card, booking-section, booking-form, gallery-grid, gallery-item styles
+           and adapting them where necessary or letting new styles override */
+    </style>
 </head>
 <body>
+    <div class="header">
+        <div class="logo">TrungLH Travel</div>
+        <div>Tours</div>
+    </div>
+
     <div class="logo-container" onclick="window.location.href='Home page.HTML'">
         <img src="images/image1.png" alt="TrungLH Travel">
     </div>
 
     <div class="container">
-        <div class="tour-details">
-            <div class="tour-header">
-                <div class="tour-image">
-                    <img src="" alt="" id="tour-image">
-                </div>
-                <div class="tour-info">
-                    <h1 class="tour-title" id="tour-title"></h1>
-                    <div class="tour-price" id="tour-price"></div>
-                    <p class="tour-description" id="tour-description"></p>
-                    <div class="tour-features">
-                        <div class="feature-card">
-                            <h4>Thời gian và Lịch trình</h4>
-                            <ul id="tour-schedule"></ul>
-                        </div>
-                        <div class="feature-card">
-                            <h4>Dịch vụ bao gồm</h4>
-                            <ul id="tour-includes"></ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <h1 class="cruise-title" id="tour-title">Đang tải...</h1>
 
-            <div class="booking-section">
-                <h2>Đặt Tour</h2>
-                <div class="booking-form">
-                    <input type="date" id="tour-date" placeholder="Chọn ngày">
-                    <select id="tour-guests" title="Số người tham gia">
-                        <option value="1">1 người</option>
-                        <option value="2">2 người</option>
-                        <option value="3">3 người</option>
-                        <option value="4">4 người</option>
-                    </select>
-                    <input type="text" id="tour-name" placeholder="Họ và tên">
-                    <input type="tel" id="tour-phone" placeholder="Số điện thoại">
-                    <input type="email" id="tour-email" placeholder="Email">
-                </div>
-                <button class="book-button" onclick="bookTour()">Đặt Tour Ngay</button>
-            </div>
+        <img src="" alt="" id="tour-image" class="main-image">
 
-            <div class="tour-gallery">
-                <h2>Hình ảnh tour</h2>
-                <div class="gallery-grid" id="tour-gallery"></div>
+        <div class="image-gallery" id="tour-gallery">
+            <!-- Gallery images will be loaded here by JS -->
+        </div>
+
+        <div class="description" id="tour-description"></div>
+
+        <div class="booking-box">
+            <h2>Đặt Tour</h2>
+            <div class="booking-form">
+                <input type="date" id="tour-date" placeholder="Chọn ngày">
+                <select id="tour-guests" title="Số người tham gia">
+                    <option value="1">1 người</option>
+                    <option value="2">2 người</option>
+                    <option value="3">3 người</option>
+                    <option value="4">4 người</option>
+                </select>
+                <input type="text" id="tour-name" placeholder="Họ và tên">
+                <input type="tel" id="tour-phone" placeholder="Số điện thoại">
+                <input type="email" id="tour-email" placeholder="Email">
             </div>
+            <button class="book-button" onclick="bookTour()">Đặt Tour Ngay</button>
+        </div>
+
+        <div class="details-section">
+            <div class="details-title">Thời gian và Lịch trình</div>
+            <ul id="tour-schedule"></ul>
+            <div class="details-title">Dịch vụ bao gồm</div>
+            <ul id="tour-includes"></ul>
+            <div class="details-title">Dịch vụ không bao gồm</div>
+            <ul id="tour-excludes"></ul>
         </div>
     </div>
 
@@ -232,141 +335,103 @@
         const tourId = urlParams.get('id');
 
         // Tour data (in a real application, this would come from an API)
-        const tourData = {
-            'combo1': {
-                title: 'Tour Hạ Long 3N2Đ',
-                price: '4.598.000 VND',
-                description: 'Tour Hạ Long trọn gói 3 Ngày 2 Đêm với đầy đủ dịch vụ và vé máy bay',
-                duration: ['3 ngày 2 đêm'],
-                includes: [
-                    'Vé máy bay khứ hồi',
-                    'Khách sạn 4 sao',
-                    'Ăn uống theo chương trình',
-                    'Hướng dẫn viên chuyên nghiệp',
-                    'Bảo hiểm du lịch'
-                ],
-                schedule: [
-                    'Ngày 1: Đón sân bay - Check-in khách sạn',
-                    'Ngày 2: Tham quan vịnh Hạ Long',
-                    'Ngày 3: Trả phòng - Tiễn sân bay'
-                ],
-                images: [
-                    'images/halong-bay.png',
-                    'images/halong-bay.png',
-                    'images/halong-bay.png',
-                    'images/halong-bay.png'
-                ]
-            },
-            'combo2': {
-                title: 'Tour SaPa 4N3Đ',
-                price: '6.598.000 VND',
-                description: 'Tour SaPa trọn gói 4 Ngày 3 Đêm với đầy đủ dịch vụ và vé máy bay',
-                duration: ['4 ngày 3 đêm'],
-                includes: [
-                    'Vé máy bay khứ hồi',
-                    'Khách sạn 4 sao',
-                    'Ăn uống theo chương trình',
-                    'Hướng dẫn viên chuyên nghiệp',
-                    'Bảo hiểm du lịch'
-                ],
-                schedule: [
-                    'Ngày 1: Đón sân bay - Check-in khách sạn',
-                    'Ngày 2: Tham quan Fansipan',
-                    'Ngày 3: Tham quan bản Cát Cát',
-                    'Ngày 4: Trả phòng - Tiễn sân bay'
-                ],
-                images: [
-                    'images/sapa.png',
-                    'images/sapa.png',
-                    'images/sapa.png',
-                    'images/sapa.png'
-                ]
-            },
-            'combo3': {
-                title: 'Tour Nha Trang 3N2Đ',
-                price: '5.998.000 VND',
-                description: 'Tour Nha Trang trọn gói 3 Ngày 2 Đêm với đầy đủ dịch vụ và vé máy bay',
-                duration: ['3 ngày 2 đêm'],
-                includes: [
-                    'Vé máy bay khứ hồi',
-                    'Khách sạn 4 sao',
-                    'Ăn uống theo chương trình',
-                    'Hướng dẫn viên chuyên nghiệp',
-                    'Bảo hiểm du lịch'
-                ],
-                schedule: [
-                    'Ngày 1: Đón sân bay - Check-in khách sạn',
-                    'Ngày 2: Tham quan đảo',
-                    'Ngày 3: Trả phòng - Tiễn sân bay'
-                ],
-                images: [
-                    'images/nhatrang.png',
-                    'images/nhatrang.png',
-                    'images/nhatrang.png',
-                    'images/nhatrang.png'
-                ]
-            },
-            'combo4': {
-                title: 'Tour Tây Nguyên 3N2Đ',
-                price: '6.998.000 VND',
-                description: 'Tour Tây Nguyên trọn gói 3N2Đ + Teambuilding + Gala Dinner',
-                duration: ['3 ngày 2 đêm'],
-                includes: [
-                    'Vé máy bay khứ hồi',
-                    'Khách sạn 4 sao',
-                    'Ăn uống theo chương trình',
-                    'Hướng dẫn viên chuyên nghiệp',
-                    'Bảo hiểm du lịch',
-                    'Teambuilding',
-                    'Gala Dinner'
-                ],
-                schedule: [
-                    'Ngày 1: Đón sân bay - Check-in khách sạn',
-                    'Ngày 2: Teambuilding - Gala Dinner',
-                    'Ngày 3: Trả phòng - Tiễn sân bay'
-                ],
-                images: [
-                    'images/taynguyen.png',
-                    'images/taynguyen.png',
-                    'images/taynguyen.png',
-                    'images/taynguyen.png'
-                ]
-            }
-        };
+        // const tourData = { ... }; // Removed this part
 
         // Load tour details
-        function loadTourDetails() {
-            const tour = tourData[tourId];
-            if (!tour) {
-                window.location.href = 'Home page.HTML';
+        async function loadTourDetails() {
+            if (!tourId) {
+                document.getElementById('tour-title').textContent = 'Tour ID không hợp lệ.';
                 return;
             }
 
-            document.getElementById('tour-title').textContent = tour.title;
-            document.getElementById('tour-price').textContent = tour.price;
-            document.getElementById('tour-description').textContent = tour.description;
-            document.getElementById('tour-image').src = tour.images[0];
-            document.getElementById('tour-image').alt = tour.title;
+            try {
+                const response = await fetch(`/api/tours/${tourId}`);
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        document.getElementById('tour-title').textContent = 'Tour không tìm thấy.';
+                    } else {
+                        document.getElementById('tour-title').textContent = 'Lỗi khi tải thông tin tour.';
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const tour = await response.json();
 
-            // Load schedule (including duration)
-            const scheduleList = document.getElementById('tour-schedule');
-            const scheduleItems = [
-                ...tour.duration,
-                ...tour.schedule
-            ];
-            scheduleList.innerHTML = scheduleItems.map(item => `<li>${item}</li>`).join('');
+                document.getElementById('tour-title').textContent = tour.name;
+                // Added fallback for price if not available
+                const priceElement = document.getElementById('tour-price');
+                if (priceElement) {
+                    priceElement.textContent = tour.price ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(tour.price) : 'Giá chưa cập nhật';
+                } else {
+                    console.warn("Element with ID 'tour-price' not found.");
+                }
+                
+                document.getElementById('tour-description').textContent = tour.description;
+                
+                const mainImage = document.getElementById('tour-image');
+                // Add onerror handler to main image
+                mainImage.onerror = function() {
+                    this.src = 'images/default-tour.png';
+                };
+                if (tour.images && tour.images.length > 0) {
+                    mainImage.src = tour.images[0];
+                    mainImage.alt = tour.name;
+                } else {
+                    mainImage.src = 'images/default-tour.png';
+                }
 
-            // Load includes
-            const includesList = document.getElementById('tour-includes');
-            includesList.innerHTML = tour.includes.map(item => `<li>${item}</li>`).join('');
+                // Load schedule (including duration)
+                const scheduleList = document.getElementById('tour-schedule');
+                scheduleList.innerHTML = tour.duration ? `<li>${tour.duration.days} ngày ${tour.duration.nights} đêm</li>` : '<li>Thông tin thời gian chưa cập nhật.</li>';
+                if (tour.itinerary && tour.itinerary.length > 0) {
+                    tour.itinerary.forEach(item => {
+                        // Added check for item.activities and join only if it's an array
+                        scheduleList.innerHTML += `<li>Ngày ${item.day}: ${Array.isArray(item.activities) ? item.activities.join(', ') : 'Hoạt động chưa cập nhật'}</li>`;
+                    });
+                } else {
+                    if (!tour.duration) { // Avoid duplicating "chưa cập nhật" message
+                         scheduleList.innerHTML += '<li>Lịch trình chi tiết chưa được cập nhật.</li>';
+                    }
+                }
 
-            // Load gallery
-            const galleryGrid = document.getElementById('tour-gallery');
-            galleryGrid.innerHTML = tour.images.map(img => `
-                <div class="gallery-item">
-                    <img src="${img}" alt="${tour.title}">
-                </div>
-            `).join('');
+                // Load includes
+                const includesList = document.getElementById('tour-includes');
+                if (tour.included && tour.included.length > 0) {
+                    includesList.innerHTML = tour.included.map(item => `<li>${item}</li>`).join('');
+                } else {
+                    includesList.innerHTML = '<li>Thông tin dịch vụ bao gồm chưa được cập nhật.</li>';
+                }
+
+                // Load excludes
+                const excludesList = document.getElementById('tour-excludes');
+                if (tour.excluded && tour.excluded.length > 0) {
+                    excludesList.innerHTML = tour.excluded.map(item => `<li>${item}</li>`).join('');
+                } else {
+                    excludesList.innerHTML = '<li>Thông tin dịch vụ không bao gồm chưa được cập nhật.</li>';
+                }
+
+                // Load gallery
+                const galleryGrid = document.getElementById('tour-gallery');
+                galleryGrid.innerHTML = ''; // Clear previous images
+                if (tour.images && tour.images.length > 0) {
+                    galleryGrid.innerHTML = tour.images.map(imgPath => {
+                        // Add onerror handler to gallery images
+                        const imageUrl = imgPath.replace(/^\/+/, ''); // Remove leading slash for consistency
+                        return `
+                            <img src="${imageUrl}" alt="${tour.name}" class="thumbnail" onerror="this.src='images/default-tour.png'">
+                        `;
+                    }).join('');
+                } else {
+                    galleryGrid.innerHTML = '<p>Không có hình ảnh nào cho tour này.</p>';
+                }
+
+            } catch (error) {
+                console.error('Failed to load tour details:', error);
+                if (!document.getElementById('tour-title').textContent.includes('Tour không tìm thấy')) {
+                     document.getElementById('tour-title').textContent = 'Lỗi khi tải thông tin tour. Vui lòng thử lại sau.';
+                }
+                document.getElementById('tour-image').src = 'images/default-tour.png'; // Set fallback on error
+                document.getElementById('tour-gallery').innerHTML = '<p>Không có hình ảnh nào cho tour này.</p>'; // Clear gallery on error
+            }
         }
 
         // Book tour function

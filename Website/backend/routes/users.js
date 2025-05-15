@@ -2,7 +2,7 @@ const express = require('express');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const authMiddleware = require('../middleware/authMiddleware'); // Import general auth middleware
-
+const bcrypt = require('bcryptjs');
 const router = express.Router();
 
 // Middleware to verify admin access
@@ -14,7 +14,7 @@ const verifyAdmin = async (req, res, next) => {
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        if (decoded.role !== 'admin') {
+        if (decoded.role !== 'admin' && decoded.role !== 'user') {
             return res.status(403).json({ message: 'Admin access required' });
         }
         req.user = decoded; // Add user info to request
@@ -76,5 +76,31 @@ router.put('/:userId', verifyAdmin, async (req, res) => {
         res.status(500).json({ message: 'Error updating user' });
     }
 });
+
+// routes/user.js
+router.put('/update-profile', authMiddleware, async (req, res) => {
+    const userId = req.user.userId; // lấy từ middleware đã decode JWT
+    const { name, phone, password } = req.body;
+
+    try {
+        const updateData = {
+            name,
+            phone,
+        };
+
+        if (password) {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            updateData.password = hashedPassword;
+        }
+
+        await User.findByIdAndUpdate(userId, updateData);
+
+        res.json({ message: 'Thông tin đã được cập nhật' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Lỗi server khi cập nhật' });
+    }
+});
+
 
 module.exports = router;

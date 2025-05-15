@@ -438,30 +438,100 @@ async function loadOrders() {
     }
 }
 
-function editOrder(orderId) {
+async function editOrder(orderId) {
     console.log('Attempting to edit order:', orderId);
-    // TODO: Implement actual edit functionality
-    // This might involve: 
-    // 1. Fetching the specific order details if not already available.
-    // 2. Populating a form or modal with the order data.
-    // 3. Submitting changes to an update API endpoint.
-    alert(`Edit functionality for order ${orderId} is not yet implemented.`);
+    showLoadingSpinner();
+    try {
+        const response = await fetch(`http://localhost:5500/api/bookings/${orderId}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('userToken')}`
+            }
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+        const order = await response.json();
+
+        document.getElementById('orderIdInput').value = order._id;
+        document.getElementById('statusSelect').value = order.status;
+        document.getElementById('paymentStatusSelect').value = order.paymentStatus;
+
+        const statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
+        statusModal.show();
+    } catch (error) {
+        console.error('Error fetching order details for edit:', error);
+        showError(`Failed to load order details: ${error.message}`);
+    } finally {
+        hideLoadingSpinner();
+    }
 }
 
-function deleteOrder(orderId) {
+async function saveOrderStatus() {
+    const orderId = document.getElementById('orderIdInput').value;
+    const newStatus = document.getElementById('statusSelect').value;
+    const newPaymentStatus = document.getElementById('paymentStatusSelect').value;
+
+    if (!orderId) {
+        showError('No order ID found for update.');
+        return;
+    }
+    showLoadingSpinner();
+
+    try {
+        const response = await fetch(`http://localhost:5500/api/bookings/${orderId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('userToken')}`
+            },
+            body: JSON.stringify({ status: newStatus, paymentStatus: newPaymentStatus })
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.message || `HTTP error! status: ${response.status}`);
+        }
+
+        const statusModalInstance = bootstrap.Modal.getInstance(document.getElementById('statusModal'));
+        if (statusModalInstance) {
+            statusModalInstance.hide();
+        }
+        showSuccess('Order status updated successfully!');
+        loadOrders(); // Refresh the table
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        showError(`Failed to update order status: ${error.message}`);
+    } finally {
+        hideLoadingSpinner();
+    }
+}
+
+async function deleteOrder(orderId) {
     console.log('Attempting to delete order:', orderId);
-    // TODO: Implement actual delete functionality
-    // This might involve: 
-    // 1. Showing a confirmation modal.
-    // 2. Sending a DELETE request to the appropriate API endpoint.
-    // 3. Reloading the orders list on success.
     if (confirm(`Are you sure you want to delete order ${orderId}?`)) {
-        alert(`Delete functionality for order ${orderId} is not yet implemented. // Placeholder for API call`);
-        // Example: Call an API endpoint and then reload
-        // fetch(`/api/orders/${orderId}`, { method: 'DELETE', headers: {'Authorization': `Bearer ${localStorage.getItem('userToken')}`} })
-        // .then(response => response.json())
-        // .then(data => { loadOrders(); showSuccess('Order deleted'); })
-        // .catch(err => { console.error(err); showError('Failed to delete order.'); });
+        showLoadingSpinner();
+        try {
+            const response = await fetch(`http://localhost:5500/api/bookings/${orderId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('userToken')}`
+                }
+            });
+
+            const result = await response.json(); 
+            if (!response.ok) {
+                 // Try to parse error message from JSON if available
+                throw new Error(result.message || `HTTP error! status: ${response.status}`);
+            }
+            showSuccess('Order deleted successfully!');
+            loadOrders(); // Refresh the table
+        } catch (error) {
+            console.error('Error deleting order:', error);
+            showError(`Failed to delete order: ${error.message}`);
+        } finally {
+            hideLoadingSpinner();
+        }
     }
 }
 
@@ -477,5 +547,10 @@ function setupEventListeners() {
     const searchInput = document.getElementById('searchInput');
     if (searchInput && typeof loadOrders === 'function') { // Check if loadOrders exists for context
         searchInput.addEventListener('input', debounce(loadOrders, 500)); // Assuming debounce is available
+    }
+
+    const saveStatusBtn = document.getElementById('saveStatusBtn');
+    if (saveStatusBtn) {
+        saveStatusBtn.addEventListener('click', saveOrderStatus);
     }
 }

@@ -14,9 +14,9 @@
     <div class="dashboard-container">
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
-            <div class="logo">
+            <div class="logo" style="display: none;">
                 <a href="/Website/frontend/Home page.HTML">
-                    <img src="/Website/frontend/images/image1.png" alt="TrungLH Travel" width="120">
+                    <img src="/images/image1.png" alt="TrungLH Travel" width="120">
                 </a>
             </div>
             <ul class="nav-links">
@@ -120,6 +120,14 @@
                                 <option value="confirmed">Confirmed</option>
                                 <option value="completed">Completed</option>
                                 <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="paymentStatusSelect" class="form-label">New Payment Status</label>
+                            <select class="form-select" id="paymentStatusSelect" required>
+                                <option value="pending">Pending</option>
+                                <option value="paid">Paid</option>
+                                <option value="refunded">Refunded</option>
                             </select>
                         </div>
                     </form>

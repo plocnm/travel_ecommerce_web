@@ -304,6 +304,7 @@
 
         <div class="booking-box">
             <h2>Đặt Tour</h2>
+            <div class="price" id="tour-price"><span class="per-person">/ người</span></div>
             <div class="booking-form">
                 <input type="date" id="tour-date" placeholder="Chọn ngày">
                 <select id="tour-guests" title="Số người tham gia">
@@ -337,6 +338,41 @@
         // Tour data (in a real application, this would come from an API)
         // const tourData = { ... }; // Removed this part
 
+        // Function to fetch user details from the backend
+        async function fetchUserDetails() {
+            try {
+                // *** IMPORTANT: Ensure the token key matches what's set during login ***
+                const token = localStorage.getItem('userToken'); // Corrected key to 'userToken'
+                if (!token) {
+                    console.warn("No auth token found (expected 'userToken'). User details cannot be fetched.");
+                    return null; // No token, cannot fetch user data
+                }
+
+                const response = await fetch('/api/users/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    // Handle cases where the user is not logged in or token is invalid
+                    if (response.status === 401 || response.status === 403) {
+                         console.warn('User not authenticated or token invalid.');
+                    } else {
+                         console.error('Failed to fetch user data:', response.statusText);
+                    }
+                    return null; // Return null if fetching fails or user is not authenticated
+                }
+
+                const userData = await response.json();
+                return userData;
+
+            } catch (error) {
+                console.error('Error fetching user details:', error);
+                return null; // Handle errors gracefully
+            }
+        }
+
         // Load tour details
         async function loadTourDetails() {
             if (!tourId) {
@@ -360,9 +396,11 @@
                 // Added fallback for price if not available
                 const priceElement = document.getElementById('tour-price');
                 if (priceElement) {
-                    priceElement.textContent = tour.price ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(tour.price) : 'Giá chưa cập nhật';
+                    const priceText = tour.price ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(tour.price) : 'Giá chưa cập nhật';
+                    // Ensure the "/ người" span is preserved
+                    priceElement.innerHTML = `${priceText} <span class="per-person">/ người</span>`;
                 } else {
-                    console.warn("Element with ID 'tour-price' not found.");
+                    console.warn("Element with ID 'tour-price' not found. Price cannot be displayed.");
                 }
                 
                 document.getElementById('tour-description').textContent = tour.description;
@@ -377,6 +415,20 @@
                     mainImage.alt = tour.name;
                 } else {
                     mainImage.src = 'images/default-tour.png';
+                }
+
+                // Call fetchUserDetails and populate form if data is available
+                const user = await fetchUserDetails();
+                if (user) {
+                    document.getElementById('tour-name').value = user.name || '';
+                    document.getElementById('tour-phone').value = user.phone || '';
+                    document.getElementById('tour-email').value = user.email || '';
+                } else {
+                    console.warn("Could not fetch user details or user is not logged in.");
+                    // Optionally clear the form or show a message asking to log in
+                    document.getElementById('tour-name').value = '';
+                    document.getElementById('tour-phone').value = '';
+                    document.getElementById('tour-email').value = '';
                 }
 
                 // Load schedule (including duration)
@@ -435,21 +487,63 @@
         }
 
         // Book tour function
-        function bookTour() {
+        async function bookTour() {
             const date = document.getElementById('tour-date').value;
             const guests = document.getElementById('tour-guests').value;
             const name = document.getElementById('tour-name').value;
             const phone = document.getElementById('tour-phone').value;
             const email = document.getElementById('tour-email').value;
 
-            if (!date || !name || !phone || !email) {
-                alert('Vui lòng điền đầy đủ thông tin');
+            if (!tourId) {
+                alert('Không thể xác định tour. Vui lòng thử lại.');
                 return;
             }
 
-            // Here you would typically make an API call to book the tour
-            alert('Đặt tour thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.');
-            window.location.href = 'Home page.HTML';
+            if (!date || !name || !phone || !email) {
+                alert('Vui lòng điền đầy đủ thông tin cá nhân và ngày đi.');
+                return;
+            }
+
+            const token = localStorage.getItem('userToken');
+            if (!token) {
+                alert('Bạn cần đăng nhập để đặt tour. Đang chuyển hướng đến trang đăng nhập...');
+                window.location.href = 'login.html'; // Or your login page
+                return;
+            }
+
+            const bookingData = {
+                tour: tourId, // tourId is globally available
+                quantity: parseInt(guests, 10),
+                date: date,
+                paymentMethod: 'bank_transfer' // Default or can be made selectable
+                // User details (name, phone, email) are not directly sent to this booking endpoint
+                // as the backend uses the authenticated user's ID.
+                // If participants' details are needed, backend and frontend need adjustment.
+            };
+
+            try {
+                const response = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(bookingData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) { // status 200-299
+                    alert('Đặt tour thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.');
+                    window.location.href = 'Home page.HTML'; // Redirect to home or a booking confirmation page
+                } else {
+                    // Display error message from backend if available, otherwise a generic one
+                    alert(`Đặt tour thất bại: ${result.message || response.statusText}`);
+                }
+            } catch (error) {
+                console.error('Error booking tour:', error);
+                alert('Lỗi khi đặt tour. Vui lòng thử lại sau.');
+            }
         }
 
         // Load details when page loads

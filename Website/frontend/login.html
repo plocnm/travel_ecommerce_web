@@ -68,7 +68,8 @@
                         window.location.href = 'Home page.HTML';
                     }
                 } else {
-                    alert('Email hoặc mật khẩu không chính xác');
+                    const errorData = await response.json(); // Try to get error message from backend
+                    alert(errorData.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
                 }
             } catch (error) {
                 console.error('Login error:', error);

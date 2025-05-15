@@ -1,6 +1,7 @@
 const express = require('express');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const authMiddleware = require('../middleware/authMiddleware'); // Import general auth middleware
 
 const router = express.Router();
 
@@ -31,6 +32,27 @@ router.get('/', verifyAdmin, async (req, res) => {
     } catch (error) {
         console.error('Error fetching users:', error);
         res.status(500).json({ message: 'Error fetching users' });
+    }
+});
+
+// Get current logged-in user's details
+router.get('/me', authMiddleware, async (req, res) => {
+    try {
+        // req.user is populated by authMiddleware and contains the decoded token (e.g., userId)
+        const user = await User.findById(req.user.userId).select('-password -verificationCode -resetPasswordCode -resetCodeExpiry -__v'); // Exclude sensitive fields
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        // Ensure you return the fields the frontend expects: name, email, phone
+        res.json({
+            name: user.name,
+            email: user.email,
+            phone: user.phone // Assuming 'phone' exists on your User model
+        });
+    } catch (error) {
+        console.error('Error fetching current user details:', error);
+        res.status(500).json({ message: 'Error fetching user details' });
     }
 });
 

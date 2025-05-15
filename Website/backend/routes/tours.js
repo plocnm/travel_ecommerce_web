@@ -28,9 +28,9 @@ router.get('/', async (req, res) => {
         }
 
         const tours = await Tour.find(filter)
-            .select('name destination duration price status maxParticipants currentParticipants description')
+            .select('name destination duration price status maxParticipants currentParticipants description images')
             .sort({ createdAt: -1 });
-            
+    
         res.json(tours);
     } catch (error) {
         console.error('Error fetching tours:', error);

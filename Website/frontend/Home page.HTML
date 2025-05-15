@@ -293,52 +293,65 @@
         }
 
         // Fetch and display tours
-        async function loadTours() {
-            try {
-                const response = await fetch('/api/tours');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const tours = await response.json();
-                const comboContainer = document.getElementById('combo-container');
-                comboContainer.innerHTML = ''; // Clear existing content
-
-                if (tours.length === 0) {
-                    comboContainer.innerHTML = '<p>Không có tour nào.</p>';
-                    return;
-                }
-
-                tours.forEach(tour => {
-                    const tourCard = document.createElement('div');
-                    tourCard.classList.add('tour-card');
-                    tourCard.onclick = () => {
-                        window.location.href = `tour_details.html?id=${tour._id}`;
-                    };
-
-                    // Assuming tour.images is an array and we take the first image
-                    const imageUrl = tour.images && tour.images.length > 0 ? tour.images[0] : 'images/default-tour.png';
-                    // Format price to Vietnamese Dong
-                    const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(tour.price);
-
-
-                    tourCard.innerHTML = `
-                        <img src="${imageUrl}" alt="${tour.name}">
-                        <div class="tour-info">
-                            <h3>${tour.name}</h3>
-                            <p>${tour.duration.days} ngày ${tour.duration.nights} đêm</p>
-                            <p><strong>${tour.destination}</strong></p>
-                            <p>${tour.description.substring(0, 100)}...</p> <!-- Short description -->
-                            <p class="price">${formattedPrice}</p>
-                        </div>
-                    `;
-                    comboContainer.appendChild(tourCard);
-                });
-            } catch (error) {
-                console.error('Failed to load tours:', error);
-                const comboContainer = document.getElementById('combo-container');
-                comboContainer.innerHTML = '<p>Lỗi khi tải danh sách tour. Vui lòng thử lại sau.</p>';
-            }
+        // Fetch và hiển thị các tour
+async function loadTours() {
+    try {
+        const response = await fetch('/api/tours');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+
+        const tours = await response.json();
+        const comboContainer = document.getElementById('combo-container');
+        comboContainer.innerHTML = ''; // Xóa nội dung cũ
+
+        if (tours.length === 0) {
+            comboContainer.innerHTML = '<p>Không có tour nào.</p>';
+            return;
+        }
+
+        tours.forEach(tour => {
+            console.log('------------------------------');
+            console.log('Tên tour:', tour.name);
+            console.log('Ảnh (tour.images):', tour.images);
+
+            let imageUrl = '/images/image1.png'; // fallback
+
+            if (Array.isArray(tour.images) && tour.images.length > 0 && typeof tour.images[0] === 'string') {
+                // Loại bỏ dấu / nếu có để tránh lỗi //images
+                imageUrl = `/${tour.images[0].replace(/^\/+/, '')}`;
+            }
+
+            console.log('URL ảnh sẽ dùng:', imageUrl);
+
+            const tourCard = document.createElement('div');
+            tourCard.classList.add('tour-card');
+            tourCard.onclick = () => {
+                window.location.href = `tour_details.html?id=${tour._id}`;
+            };
+
+            // Format giá
+            const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(tour.price);
+
+            tourCard.innerHTML = `
+                <img src="${imageUrl}" alt="${tour.name}" onerror="this.src='/images/image1.png'">
+                <div class="tour-info">
+                    <h3>${tour.name}</h3>
+                    <p>${tour.duration.days} ngày ${tour.duration.nights} đêm</p>
+                    <p><strong>${tour.destination}</strong></p>
+                    <p>${tour.description?.substring(0, 100) || ''}...</p>
+                    <p class="price">${formattedPrice}</p>
+                </div>
+            `;
+            comboContainer.appendChild(tourCard);
+        });
+
+    } catch (error) {
+        console.error('Lỗi khi tải danh sách tour:', error);
+        const comboContainer = document.getElementById('combo-container');
+        comboContainer.innerHTML = '<p>Lỗi khi tải danh sách tour. Vui lòng thử lại sau.</p>';
+    }
+}
 
         // Check if user is logged in and display their name
         document.addEventListener('DOMContentLoaded', function() {

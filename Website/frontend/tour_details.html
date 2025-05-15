@@ -173,60 +173,159 @@
             transform: scale(1.05);
         }
     </style>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .header {
+            background-color: #1ba0e2;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        /* Existing container style */
+        /*
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        */
+        /* New container style from snippet */
+        .container {
+          max-width: 1000px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .cruise-title {
+          font-size: 24px;
+          font-weight: bold;
+          margin-bottom: 15px;
+        }
+        .cruise-rating {
+          color: #f8b400;
+          margin-bottom: 20px;
+        }
+        .main-image {
+          width: 100%;
+          height: 300px;
+          object-fit: cover;
+          border-radius: 8px;
+          margin-bottom: 20px;
+        }
+        .image-gallery {
+          display: flex;
+          gap: 10px;
+          margin-bottom: 20px;
+        }
+        .thumbnail {
+          width: 32%;
+          height: 100px;
+          object-fit: cover;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+        .description { /* Reusing tour-description ID, adding .description class */
+          line-height: 1.6;
+          margin-bottom: 30px;
+        }
+        .booking-box {
+          background-color: #f9f9f9;
+          border-radius: 8px;
+          padding: 20px;
+          margin-bottom: 30px;
+        }
+        .price { /* Reusing tour-price ID, adding .price class */
+          font-size: 28px;
+          font-weight: bold;
+          color: #1ba0e2; /* Using the blue from the snippet header */
+          margin-bottom: 10px;
+        }
+        .per-person {
+          font-size: 14px;
+          color: #666;
+        }
+        .book-button { /* Reusing book-button class */
+          background-color: #ff5e1f; /* Using the orange from the snippet button */
+          color: white;
+          border: none;
+          padding: 12px 30px;
+          font-size: 16px;
+          border-radius: 5px;
+          cursor: pointer;
+          width: 100%;
+          margin-top: 15px;
+        }
+        .details-section { /* Reusing tour-features structure */
+          margin-bottom: 30px;
+        }
+        .details-title { /* Reusing feature-card h4 style */
+          font-size: 18px;
+          font-weight: bold;
+          margin-bottom: 10px;
+        }
+        .itinerary-item { /* Reusing feature-card li style */
+          margin-bottom: 5px;
+        }
+        /* Keeping existing tour-details, tour-header, tour-image, tour-info,
+           feature-card, booking-section, booking-form, gallery-grid, gallery-item styles
+           and adapting them where necessary or letting new styles override */
+    </style>
 </head>
 <body>
+    <div class="header">
+        <div class="logo">TrungLH Travel</div>
+        <div>Tours</div>
+    </div>
+
     <div class="logo-container" onclick="window.location.href='Home page.HTML'">
         <img src="images/image1.png" alt="TrungLH Travel">
     </div>
 
     <div class="container">
-        <div class="tour-details">
-            <div class="tour-header">
-                <div class="tour-image">
-                    <img src="" alt="" id="tour-image">
-                </div>
-                <div class="tour-info">
-                    <h1 class="tour-title" id="tour-title">Đang tải...</h1>
-                    <div class="tour-price" id="tour-price"></div>
-                    <p class="tour-description" id="tour-description"></p>
-                    <div class="tour-features">
-                        <div class="feature-card">
-                            <h4>Thời gian và Lịch trình</h4>
-                            <ul id="tour-schedule"></ul>
-                        </div>
-                        <div class="feature-card">
-                            <h4>Dịch vụ bao gồm</h4>
-                            <ul id="tour-includes"></ul>
-                        </div>
-                        <div class="feature-card">
-                            <h4>Dịch vụ không bao gồm</h4>
-                            <ul id="tour-excludes"></ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <h1 class="cruise-title" id="tour-title">Đang tải...</h1>
 
-            <div class="booking-section">
-                <h2>Đặt Tour</h2>
-                <div class="booking-form">
-                    <input type="date" id="tour-date" placeholder="Chọn ngày">
-                    <select id="tour-guests" title="Số người tham gia">
-                        <option value="1">1 người</option>
-                        <option value="2">2 người</option>
-                        <option value="3">3 người</option>
-                        <option value="4">4 người</option>
-                    </select>
-                    <input type="text" id="tour-name" placeholder="Họ và tên">
-                    <input type="tel" id="tour-phone" placeholder="Số điện thoại">
-                    <input type="email" id="tour-email" placeholder="Email">
-                </div>
-                <button class="book-button" onclick="bookTour()">Đặt Tour Ngay</button>
-            </div>
+        <img src="" alt="" id="tour-image" class="main-image">
 
-            <div class="tour-gallery">
-                <h2>Hình ảnh tour</h2>
-                <div class="gallery-grid" id="tour-gallery"></div>
+        <div class="image-gallery" id="tour-gallery">
+            <!-- Gallery images will be loaded here by JS -->
+        </div>
+
+        <div class="description" id="tour-description"></div>
+
+        <div class="booking-box">
+            <h2>Đặt Tour</h2>
+            <div class="booking-form">
+                <input type="date" id="tour-date" placeholder="Chọn ngày">
+                <select id="tour-guests" title="Số người tham gia">
+                    <option value="1">1 người</option>
+                    <option value="2">2 người</option>
+                    <option value="3">3 người</option>
+                    <option value="4">4 người</option>
+                </select>
+                <input type="text" id="tour-name" placeholder="Họ và tên">
+                <input type="tel" id="tour-phone" placeholder="Số điện thoại">
+                <input type="email" id="tour-email" placeholder="Email">
             </div>
+            <button class="book-button" onclick="bookTour()">Đặt Tour Ngay</button>
+        </div>
+
+        <div class="details-section">
+            <div class="details-title">Thời gian và Lịch trình</div>
+            <ul id="tour-schedule"></ul>
+            <div class="details-title">Dịch vụ bao gồm</div>
+            <ul id="tour-includes"></ul>
+            <div class="details-title">Dịch vụ không bao gồm</div>
+            <ul id="tour-excludes"></ul>
         </div>
     </div>
 
@@ -258,10 +357,21 @@
                 const tour = await response.json();
 
                 document.getElementById('tour-title').textContent = tour.name;
-                document.getElementById('tour-price').textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(tour.price);
+                // Added fallback for price if not available
+                const priceElement = document.getElementById('tour-price');
+                if (priceElement) {
+                    priceElement.textContent = tour.price ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(tour.price) : 'Giá chưa cập nhật';
+                } else {
+                    console.warn("Element with ID 'tour-price' not found.");
+                }
+                
                 document.getElementById('tour-description').textContent = tour.description;
                 
                 const mainImage = document.getElementById('tour-image');
+                // Add onerror handler to main image
+                mainImage.onerror = function() {
+                    this.src = 'images/default-tour.png';
+                };
                 if (tour.images && tour.images.length > 0) {
                     mainImage.src = tour.images[0];
                     mainImage.alt = tour.name;
@@ -271,13 +381,16 @@
 
                 // Load schedule (including duration)
                 const scheduleList = document.getElementById('tour-schedule');
-                scheduleList.innerHTML = `<li>${tour.duration.days} ngày ${tour.duration.nights} đêm</li>`;
+                scheduleList.innerHTML = tour.duration ? `<li>${tour.duration.days} ngày ${tour.duration.nights} đêm</li>` : '<li>Thông tin thời gian chưa cập nhật.</li>';
                 if (tour.itinerary && tour.itinerary.length > 0) {
                     tour.itinerary.forEach(item => {
-                        scheduleList.innerHTML += `<li>Ngày ${item.day}: ${item.activities.join(', ')}</li>`;
+                        // Added check for item.activities and join only if it's an array
+                        scheduleList.innerHTML += `<li>Ngày ${item.day}: ${Array.isArray(item.activities) ? item.activities.join(', ') : 'Hoạt động chưa cập nhật'}</li>`;
                     });
                 } else {
-                    scheduleList.innerHTML += '<li>Lịch trình chi tiết chưa được cập nhật.</li>';
+                    if (!tour.duration) { // Avoid duplicating "chưa cập nhật" message
+                         scheduleList.innerHTML += '<li>Lịch trình chi tiết chưa được cập nhật.</li>';
+                    }
                 }
 
                 // Load includes
@@ -300,11 +413,13 @@
                 const galleryGrid = document.getElementById('tour-gallery');
                 galleryGrid.innerHTML = ''; // Clear previous images
                 if (tour.images && tour.images.length > 0) {
-                    galleryGrid.innerHTML = tour.images.map(imgPath => `
-                        <div class="gallery-item">
-                            <img src="${imgPath}" alt="${tour.name}">
-                        </div>
-                    `).join('');
+                    galleryGrid.innerHTML = tour.images.map(imgPath => {
+                        // Add onerror handler to gallery images
+                        const imageUrl = imgPath.replace(/^\/+/, ''); // Remove leading slash for consistency
+                        return `
+                            <img src="${imageUrl}" alt="${tour.name}" class="thumbnail" onerror="this.src='images/default-tour.png'">
+                        `;
+                    }).join('');
                 } else {
                     galleryGrid.innerHTML = '<p>Không có hình ảnh nào cho tour này.</p>';
                 }
@@ -314,6 +429,8 @@
                 if (!document.getElementById('tour-title').textContent.includes('Tour không tìm thấy')) {
                      document.getElementById('tour-title').textContent = 'Lỗi khi tải thông tin tour. Vui lòng thử lại sau.';
                 }
+                document.getElementById('tour-image').src = 'images/default-tour.png'; // Set fallback on error
+                document.getElementById('tour-gallery').innerHTML = '<p>Không có hình ảnh nào cho tour này.</p>'; // Clear gallery on error
             }
         }
 

@@ -5,18 +5,65 @@ const Booking = require('../models/Booking');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-// Flight search endpoint
+// Map địa danh chuẩn hóa
+const locationMap = {
+    'hanoi': 'Hà Nội',
+    'ha noi': 'Hà Nội',
+    'hn': 'Hà Nội',
+    'hochiminh': 'Hồ Chí Minh',
+    'ho chi minh': 'Hồ Chí Minh',
+    'hcm': 'Hồ Chí Minh',
+    'saigon': 'Hồ Chí Minh',
+    'danang': 'Đà Nẵng',
+    'da nang': 'Đà Nẵng',
+    'dalat': 'Đà Lạt',
+    'da lat': 'Đà Lạt',
+    'hue': 'Huế',
+    'nhatrang': 'Nha Trang',
+    'nha trang': 'Nha Trang',
+    'phuquoc': 'Phú Quốc',
+    'phu quoc': 'Phú Quốc',
+    'sapa': 'Sapa'
+};
+
+// Hàm chuẩn hóa tiếng Việt
+const normalizeText = (text) => {
+    if (!text) return '';
+    return text
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/\s+/g, '');
+};
+
+// Tìm kiếm chuyến bay
 router.get('/search', async (req, res) => {
     try {
-        const { departure, arrival, date } = req.query;
-        
+        const { departure, arrival, date, passengers = 1, class: flightClass = 'economy' } = req.query;
+
+        if (!departure || !arrival || !date) {
+            return res.status(400).json({ message: 'Thiếu thông tin điểm đi, điểm đến hoặc ngày khởi hành.' });
+        }
+
+        const normalizedDeparture = normalizeText(departure);
+        const normalizedArrival = normalizeText(arrival);
+
+        const vietnameseDeparture = locationMap[normalizedDeparture] || departure;
+        const vietnameseArrival = locationMap[normalizedArrival] || arrival;
+
+        const startDate = new Date(date);
+        const endDate = new Date(date);
+        endDate.setDate(startDate.getDate() + 1);
+
         const flights = await Flight.find({
-            'departure.city': { $regex: departure, $options: 'i' },
-            'arrival.city': { $regex: arrival, $options: 'i' },
+            'departure.city': { $regex: vietnameseDeparture, $options: 'i' },
+            'arrival.city': { $regex: vietnameseArrival, $options: 'i' },
             'departure.time': {
-                $gte: new Date(date),
-                $lt: new Date(new Date(date).setDate(new Date(date).getDate() + 1))
+                $gte: startDate,
+                $lt: endDate
             },
+            availableSeats: { $gte: parseInt(passengers) },
             status: 'scheduled'
         });
 
@@ -27,58 +74,63 @@ router.get('/search', async (req, res) => {
     }
 });
 
-// Flight booking endpoint
+// Đặt vé máy bay
 router.post('/book', async (req, res) => {
     try {
-        const { flightId, passengers, class: flightClass, seats } = req.body;
+        const { flightId, passengers, class: flightClass } = req.body;
         const token = req.headers.authorization?.split(' ')[1];
 
         if (!token) {
             return res.status(401).json({ message: 'Vui lòng đăng nhập để đặt vé' });
         }
 
-        // Verify token and get user
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await User.findById(decoded.userId);
-
         if (!user) {
             return res.status(401).json({ message: 'Người dùng không tồn tại' });
         }
 
-        // Get flight details
         const flight = await Flight.findById(flightId);
         if (!flight) {
             return res.status(404).json({ message: 'Chuyến bay không tồn tại' });
         }
 
-        // Calculate total amount based on class
+        const seatCount = passengers.length;
+        if (flight.availableSeats < seatCount) {
+            return res.status(400).json({ message: 'Không đủ chỗ ngồi trên chuyến bay' });
+        }
+
         const priceMultiplier = {
             'economy': 1,
             'business': 2,
             'first': 3
         };
-        const totalAmount = flight.price * priceMultiplier[flightClass] * passengers.length;
 
-        // Create booking
+        const multiplier = priceMultiplier[flightClass] || 1;
+        const totalAmount = flight.price * multiplier * seatCount;
+
         const booking = new Booking({
             user: user._id,
             type: 'flight',
             status: 'pending',
             totalAmount,
             paymentStatus: 'pending',
-            paymentMethod: 'credit_card', // Default payment method
+            paymentMethod: 'credit_card',
             flight: {
-                flight: flightId,
+                flight: flight._id,
                 passengers,
-                class: flightClass,
-                seats
+                class: flightClass
             }
         });
+
+        // Giảm số ghế
+        flight.availableSeats -= seatCount;
+        await flight.save();
 
         await booking.save();
 
         res.status(201).json({
-            message: 'Đặt vé thành công',
+            message: 'Đặt vé máy bay thành công',
             booking
         });
     } catch (error) {
@@ -87,4 +139,4 @@ router.post('/book', async (req, res) => {
     }
 });
 
-module.exports = router; 
+module.exports = router;

@@ -3,7 +3,8 @@ const router = express.Router();
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const sendVerificationEmail = require('../models/sendVerificationEmail'); // Đường dẫn đúng đến file gửi email
-
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 // Đăng nhập
 router.post('/login', async (req, res) => {
 try {
@@ -29,12 +30,62 @@ try {
                 id: user._id,
                 name: user.name,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                isVerified: user.isVerified
             }
         });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ message: 'Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại sau.' });
+    }
+});
+
+// Google Login
+router.post('/google-login', async (req, res) => {
+    const { credential } = req.body;
+
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+
+        const payload = ticket.getPayload();
+        const { email, name } = payload;
+
+        let user = await User.findOne({ email });
+
+        // Nếu người dùng chưa tồn tại, tạo mới
+        if (!user) {
+            user = new User({
+                name,
+                email,
+                password: Math.random().toString(36).slice(-8), // tạm thời
+                isVerified: true, // bỏ qua bước xác minh email
+            });
+            await user.save();
+        }
+
+        // Tạo token JWT
+        const token = jwt.sign(
+            { userId: user._id, email: user.email, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        res.json({
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                isVerified: user.isVerified
+            }
+        });
+    } catch (error) {
+        console.error('Google login error:', error);
+        res.status(500).json({ message: 'Lỗi xác thực Google.' });
     }
 });
 

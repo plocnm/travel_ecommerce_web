@@ -70,6 +70,11 @@
                 return;
             }
 
+            if(date < new Date().toISOString().split('T')[0]) {
+                alert("Ngày bay không hợp lệ.");
+                return;
+            }
+
             const resultsSection = document.getElementById('flight-results');
             const flightsList = document.getElementById('flights-list');
             flightsList.innerHTML = '<p>Đang tìm kiếm chuyến bay...</p>';

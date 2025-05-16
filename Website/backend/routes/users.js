@@ -56,6 +56,31 @@ router.get('/me', authMiddleware, async (req, res) => {
     }
 });
 
+// Update current logged-in user's profile
+router.put('/update-profile', authMiddleware, async (req, res) => {
+    const userId = req.user.userId; // lấy từ middleware đã decode JWT
+    const { name, phone, password } = req.body;
+
+    try {
+        const updateData = {
+            name,
+            phone,
+        };
+
+        if (password) {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            updateData.password = hashedPassword;
+        }
+
+        await User.findByIdAndUpdate(userId, updateData, { new: true, runValidators: true });
+
+        res.json({ message: 'Thông tin đã được cập nhật' });
+    } catch (err) {
+        console.error('Error updating profile for user:', userId, err); // Log more details
+        res.status(500).json({ message: `Lỗi server khi cập nhật: ${err.message}` }); // Send back more specific error
+    }
+});
+
 // Update user role/status (admin only)
 router.put('/:userId', verifyAdmin, async (req, res) => {
     try {
@@ -76,31 +101,5 @@ router.put('/:userId', verifyAdmin, async (req, res) => {
         res.status(500).json({ message: 'Error updating user' });
     }
 });
-
-// routes/user.js
-router.put('/update-profile', authMiddleware, async (req, res) => {
-    const userId = req.user.userId; // lấy từ middleware đã decode JWT
-    const { name, phone, password } = req.body;
-
-    try {
-        const updateData = {
-            name,
-            phone,
-        };
-
-        if (password) {
-            const hashedPassword = await bcrypt.hash(password, 10);
-            updateData.password = hashedPassword;
-        }
-
-        await User.findByIdAndUpdate(userId, updateData);
-
-        res.json({ message: 'Thông tin đã được cập nhật' });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Lỗi server khi cập nhật' });
-    }
-});
-
 
 module.exports = router;

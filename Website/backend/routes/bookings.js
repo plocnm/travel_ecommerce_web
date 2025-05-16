@@ -36,15 +36,15 @@ router.get('/my-bookings', authMiddleware, async (req, res) => {
     }
 });
 
-// GET a single booking by ID (newly added)
+// GET a single booking by ID
 router.get('/:id', authMiddleware, async (req, res) => {
     try {
         const booking = await Booking.findById(req.params.id)
             .populate('user', 'name email') // Populate user details
-            // Add other populates if needed, e.g., for flight, hotel, tour details
-            // .populate('flight.flight', 'flightNumber airline')
-            // .populate('hotel.hotel', 'name location.city')
-            // .populate('tour.tour', 'name destination');
+            // Example populates (uncomment if needed for edit view)
+            // .populate('flight.flight')
+            // .populate('hotel.hotel')
+            // .populate('tour.tour');
 
         if (!booking) {
             return res.status(404).json({ msg: 'Booking not found' });
@@ -59,9 +59,9 @@ router.get('/:id', authMiddleware, async (req, res) => {
     }
 });
 
-// Placeholder for PUT (update) a booking
+// PUT (update) a booking by ID
 router.put('/:id', authMiddleware, async (req, res) => {
-    const { status, paymentStatus /* other fields to update */ } = req.body;
+    const { status, paymentStatus /* other fields like totalAmount, etc. */ } = req.body;
     const { id } = req.params;
 
     try {
@@ -71,21 +71,20 @@ router.put('/:id', authMiddleware, async (req, res) => {
             return res.status(404).json({ msg: 'Booking not found' });
         }
 
-        // Check if the user is authorized to update (e.g., an admin or the booking owner)
-        // For admin, typically role check is done in authMiddleware or here
-        // For now, assuming admin has rights if middleware passed
+        // Add role-based authorization if needed (e.g., only admin can update)
+        // if (req.user.role !== 'admin') {
+        //    return res.status(403).json({ msg: 'User not authorized' });
+        // }
 
         const updateFields = {};
         if (status) updateFields.status = status;
         if (paymentStatus) updateFields.paymentStatus = paymentStatus;
-        // Add other fields as necessary
-        // Example: if (req.body.totalAmount) updateFields.totalAmount = req.body.totalAmount;
-
+        // Add other fields from req.body to updateFields if they are present and valid
 
         booking = await Booking.findByIdAndUpdate(
             id,
             { $set: updateFields },
-            { new: true } // Return the updated document
+            { new: true, runValidators: true } // Return updated doc and run schema validators
         ).populate('user', 'name email');
 
         res.json(booking);
@@ -94,11 +93,14 @@ router.put('/:id', authMiddleware, async (req, res) => {
         if (err.kind === 'ObjectId') {
             return res.status(404).json({ msg: 'Booking not found (Invalid ID)' });
         }
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ msg: err.message });
+        }
         res.status(500).send('Server Error');
     }
 });
 
-// Placeholder for DELETE a booking
+// DELETE a booking by ID
 router.delete('/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
 
@@ -109,8 +111,10 @@ router.delete('/:id', authMiddleware, async (req, res) => {
             return res.status(404).json({ msg: 'Booking not found' });
         }
 
-        // Authorization check (e.g., admin or owner)
-        // For now, assuming admin has rights if middleware passed
+        // Add role-based authorization if needed
+        // if (req.user.role !== 'admin') {
+        //    return res.status(403).json({ msg: 'User not authorized' });
+        // }
 
         await Booking.findByIdAndDelete(id);
 
@@ -127,53 +131,42 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 // POST: Đặt tour mới
 router.post('/', authMiddleware, async (req, res) => {
     try {
-        const { tour, quantity, date } = req.body;
+        const { tour, quantity, date, paymentMethod } = req.body; // Added paymentMethod
 
-        if (!tour || !quantity || !date) {
-            return res.status(400).json({ message: "Thiếu thông tin đặt tour" });
+        // Basic validation
+        if (!tour || !quantity || !date || !paymentMethod) {
+            return res.status(400).json({ message: "Thiếu thông tin đặt tour (tour, quantity, date, paymentMethod required)" });
         }
 
-        // Find the tour to get its price and details for totalAmount calculation
         const tourDetails = await Tour.findById(tour);
         if (!tourDetails) {
             return res.status(404).json({ message: "Không tìm thấy tour" });
         }
 
-        // Calculate total amount based on tour price and quantity
         const totalAmount = tourDetails.price * quantity;
 
         const newBooking = new Booking({
-            user: req.user.userId,  // authMiddleware phải gán req.user.userId
-            type: 'tour', // Specify booking type as tour
-            tour: { // Structure data according to Booking model schema
-                tour: tour, // tour ID
-                departureDate: new Date(date), // Convert date string to Date object
-                // participants can be added here if collected from frontend
-                // specialRequests can be added here if collected from frontend
+            user: req.user.userId,
+            type: 'tour',
+            tour: {
+                tour: tour,
+                departureDate: new Date(date),
+                // participants: req.body.participants || [], // Example
+                // specialRequests: req.body.specialRequests || '' // Example
             },
             totalAmount: totalAmount,
-            // paymentMethod and paymentStatus should ideally be handled after payment initiation
-            // For now, setting default or requiring in request body if simple payment flow
-            // Example: paymentMethod: req.body.paymentMethod,
-            // paymentStatus: 'pending' // Default status
-            paymentMethod: req.body.paymentMethod || 'bank_transfer' // Assuming a default or required in body
+            paymentMethod: paymentMethod, // Use provided paymentMethod
+            paymentStatus: 'pending', // Default paymentStatus
+            status: 'pending' // Default booking status
         });
 
-        // Basic validation for quantity against tour capacity if needed
-        // Note: A more robust implementation would handle concurrent bookings
-        // if (tourDetails.maxParticipants !== undefined && (tourDetails.currentParticipants + quantity) > tourDetails.maxParticipants) {
-        //     return res.status(400).json({ message: "Số lượng người vượt quá sức chứa của tour" });
-        // }
-
         await newBooking.save();
-
-        // Optional: Update currentParticipants in Tour model
-        // tourDetails.currentParticipants += quantity;
-        // await tourDetails.save();
-
         res.status(201).json(newBooking);
     } catch (err) {
         console.error('Lỗi khi lưu booking:', err.message);
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ message: err.message });
+        }
         res.status(500).json({ message: "Lỗi server khi đặt tour" });
     }
 });

@@ -93,6 +93,14 @@
                 alert("Vui lòng nhập đầy đủ thông tin khách sạn.");
                 return;
             }
+            if(checkoutDate < new Date().toISOString().split('T')[0] && checkoutDate < checkinDate) {
+        alert("Ngày trả không hợp lệ.");
+        return;
+         }
+         if(checkinDate < new Date().toISOString().split('T')[0]) {
+        alert("Ngày đặt không hợp lệ.");
+        return;
+         }
 
             // Show loading state
             const resultsSection = document.getElementById('hotel-results');

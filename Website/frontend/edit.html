@@ -9,6 +9,20 @@
             font-family: 'Segoe UI', sans-serif;
             background-color: #f2f2f2;
             padding: 20px;
+            position: relative; /* Added for positioning the home button */
+        }
+
+        /* Added style for home button */
+        .home-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000; /* Ensure it's above other elements */
+        }
+
+        .home-button img {
+            width: 100px; /* Adjust size as needed */
+            height: auto;
         }
 
         .edit-container {
@@ -73,6 +87,10 @@
 </head>
 <body>
 
+<a href="#" onclick="navigateHome()" class="home-button">
+    <img src="images/image1.png" alt="Trang Chủ">
+</a>
+
 <div class="edit-container">
     <h2>Chỉnh sửa thông tin cá nhân</h2>
     <form id="edit-profile-form">
@@ -99,6 +117,16 @@
 
 <script>
 const API_BASE = '/api'; // Define API_BASE for backend calls
+
+// Added navigateHome function
+function navigateHome() {
+    const userToken = localStorage.getItem('userToken');
+    if (userToken) {
+        window.location.href = 'Home page.HTML';
+    } else {
+        window.location.href = 'index.html';
+    }
+}
 
 // Tải dữ liệu người dùng hiện tại
 window.addEventListener('DOMContentLoaded', async () => {

@@ -325,8 +325,6 @@
             <ul id="tour-schedule"></ul>
             <div class="details-title">Dịch vụ bao gồm</div>
             <ul id="tour-includes"></ul>
-            <div class="details-title">Dịch vụ không bao gồm</div>
-            <ul id="tour-excludes"></ul>
         </div>
     </div>
 
@@ -455,10 +453,15 @@
 
                 // Load excludes
                 const excludesList = document.getElementById('tour-excludes');
-                if (tour.excluded && tour.excluded.length > 0) {
-                    excludesList.innerHTML = tour.excluded.map(item => `<li>${item}</li>`).join('');
+                if (excludesList) { // Check if the element exists
+                    if (tour.excluded && tour.excluded.length > 0) {
+                        excludesList.innerHTML = tour.excluded.map(item => `<li>${item}</li>`).join('');
+                    } else {
+                        excludesList.innerHTML = '<li>Thông tin dịch vụ không bao gồm chưa được cập nhật.</li>';
+                    }
                 } else {
-                    excludesList.innerHTML = '<li>Thông tin dịch vụ không bao gồm chưa được cập nhật.</li>';
+                    // Optionally log if the element is not found, though it's expected in this case
+                    // console.log("Element with ID 'tour-excludes' not found, skipping population.");
                 }
 
                 // Load gallery

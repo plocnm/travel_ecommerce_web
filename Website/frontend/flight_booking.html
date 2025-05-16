@@ -153,8 +153,12 @@
                     throw new Error(result.message || 'Đặt vé thất bại');
                 }
 
-                alert('Đặt vé thành công!');
-                window.location.href = 'payment.html';
+                alert(result.message);
+                if (result.redirectToPayment) {
+                    window.location.href = 'payment.html';
+                } else {
+                    window.location.href = 'Home page.HTML';
+                }
             } catch (error) {
                 alert(error.message);
             }

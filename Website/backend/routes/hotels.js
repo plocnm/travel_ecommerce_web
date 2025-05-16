@@ -157,9 +157,7 @@ router.post('/book', async (req, res) => {
         const booking = new Booking({
             user: user._id,
             type: 'hotel',
-            status: 'pending',
             totalAmount,
-            paymentStatus: 'pending',
             paymentMethod: 'credit_card', // Default payment method
             hotel: {
                 hotel: hotelId,
@@ -173,12 +171,32 @@ router.post('/book', async (req, res) => {
             }
         });
 
-        await booking.save();
-
-        res.status(201).json({
-            message: 'Đặt phòng thành công',
-            booking
-        });
+        if (user.balance >= totalAmount) {
+            user.balance -= totalAmount;
+            await user.save();
+            // Potentially update hotel room availability here
+            booking.paymentStatus = 'paid';
+            booking.status = 'confirmed';
+            await booking.save();
+            res.status(201).json({
+                booking,
+                message: 'Đặt phòng thành công và đã thanh toán.',
+                redirectToPayment: false
+            });
+        } else {
+            booking.paymentStatus = 'pending';
+            booking.status = 'pending';
+            const deadline = new Date();
+            deadline.setHours(deadline.getHours() + 24);
+            booking.paymentDeadline = deadline;
+            await booking.save();
+            // Room availability should be handled carefully, perhaps with a temporary reservation system
+            res.status(201).json({
+                booking,
+                message: 'Đặt phòng thành công. Vui lòng thanh toán trong vòng 24 giờ.',
+                redirectToPayment: true
+            });
+        }
     } catch (error) {
         console.error('Hotel booking error:', error);
         res.status(500).json({ message: 'Có lỗi xảy ra khi đặt phòng. Vui lòng thử lại sau.' });

@@ -112,10 +112,8 @@ router.post('/book', async (req, res) => {
         const booking = new Booking({
             user: user._id,
             type: 'flight',
-            status: 'pending',
             totalAmount,
-            paymentStatus: 'pending',
-            paymentMethod: 'credit_card',
+            paymentMethod: 'credit_card', // Or make this dynamic
             flight: {
                 flight: flight._id,
                 passengers,
@@ -123,16 +121,34 @@ router.post('/book', async (req, res) => {
             }
         });
 
-        // Giảm số ghế
-        flight.availableSeats -= seatCount;
-        await flight.save();
-
-        await booking.save();
-
-        res.status(201).json({
-            message: 'Đặt vé máy bay thành công',
-            booking
-        });
+        if (user.balance >= totalAmount) {
+            user.balance -= totalAmount;
+            flight.availableSeats -= seatCount; // Deduct seats only if payment is successful
+            await user.save();
+            await flight.save();
+            booking.paymentStatus = 'paid';
+            booking.status = 'confirmed';
+            await booking.save();
+            res.status(201).json({
+                booking,
+                message: 'Đặt vé máy bay thành công và đã thanh toán.',
+                redirectToPayment: false
+            });
+        } else {
+            booking.paymentStatus = 'pending';
+            booking.status = 'pending';
+            const deadline = new Date();
+            deadline.setHours(deadline.getHours() + 24);
+            booking.paymentDeadline = deadline;
+            await booking.save();
+            // Do not deduct seats here, as payment is not yet made.
+            // Seats could be reserved temporarily or handled by a separate mechanism.
+            res.status(201).json({
+                booking,
+                message: 'Đặt vé máy bay thành công. Vui lòng thanh toán trong vòng 24 giờ.',
+                redirectToPayment: true
+            });
+        }
     } catch (error) {
         console.error('Flight booking error:', error);
         res.status(500).json({ message: 'Có lỗi xảy ra khi đặt vé. Vui lòng thử lại sau.' });

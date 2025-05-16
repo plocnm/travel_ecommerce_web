@@ -537,8 +537,14 @@
                 const result = await response.json();
 
                 if (response.ok) { // status 200-299
-                    alert('Đặt tour thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.');
-                    window.location.href = 'payment.html'; // Redirect to payment page
+                    alert(result.message); // Display message from backend
+                    if (result.redirectToPayment) {
+                        window.location.href = 'payment.html'; // Redirect to payment page if needed
+                    } else {
+                        // Optionally, redirect to a booking confirmation/details page or refresh data
+                        // For now, we can redirect to home or my_orders page
+                        window.location.href = 'Home page.HTML';
+                    }
                 } else {
                     // Display error message from backend if available, otherwise a generic one
                     alert(`Đặt tour thất bại: ${result.message || response.statusText}`);

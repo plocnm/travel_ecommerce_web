@@ -3,6 +3,7 @@ const router = express.Router();
 const Booking = require('../models/Booking'); // Assuming your Booking model is here
 const authMiddleware = require('../middleware/authMiddleware'); // Assuming you have auth middleware
 const Tour = require('../models/Tour'); // Assuming your Tour model is here
+const User = require('../models/User'); // Import User model
 
 // GET all bookings (protected by auth middleware)
 router.get('/', authMiddleware, async (req, res) => {
@@ -144,6 +145,11 @@ router.post('/', authMiddleware, async (req, res) => {
         }
 
         const totalAmount = tourDetails.price * quantity;
+        const user = await User.findById(req.user.userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
 
         const newBooking = new Booking({
             user: req.user.userId,
@@ -156,12 +162,38 @@ router.post('/', authMiddleware, async (req, res) => {
             },
             totalAmount: totalAmount,
             paymentMethod: paymentMethod, // Use provided paymentMethod
-            paymentStatus: 'pending', // Default paymentStatus
-            status: 'pending' // Default booking status
         });
 
+        if (user.balance >= totalAmount) {
+            user.balance -= totalAmount;
+            await user.save();
+            newBooking.paymentStatus = 'paid';
+            newBooking.status = 'confirmed';
+        } else {
+            newBooking.paymentStatus = 'pending';
+            newBooking.status = 'pending';
+            // Set payment deadline to 24 hours from now
+            const deadline = new Date();
+            deadline.setHours(deadline.getHours() + 24);
+            newBooking.paymentDeadline = deadline;
+        }
+
         await newBooking.save();
-        res.status(201).json(newBooking);
+        // Send a more detailed response, especially if payment is pending
+        if (newBooking.paymentStatus === 'pending') {
+            res.status(201).json({
+                booking: newBooking,
+                message: 'Booking created, payment pending. Please complete payment within 24 hours.',
+                redirectToPayment: true // Indicate frontend to redirect
+            });
+        } else {
+            res.status(201).json({
+                booking: newBooking,
+                message: 'Booking confirmed and paid successfully.',
+                redirectToPayment: false
+            });
+        }
+
     } catch (err) {
         console.error('Lỗi khi lưu booking:', err.message);
         if (err.name === 'ValidationError') {

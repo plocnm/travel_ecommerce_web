@@ -34,6 +34,9 @@ const bookingSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    paymentDeadline: {
+        type: Date
+    },
     // Flight booking specific fields
     flight: {
         flight: {

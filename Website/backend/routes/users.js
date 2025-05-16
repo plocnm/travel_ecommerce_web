@@ -85,13 +85,20 @@ router.put('/update-profile', authMiddleware, async (req, res) => {
 // Update user role/status (admin only)
 router.put('/:userId', verifyAdmin, async (req, res) => {
     try {
-        const { role, status } = req.body;
+        console.log('Update request for userId:', req.params.userId, 'Body:', req.body); // Added console.log
+        const { role, status, balance } = req.body;
+        const updateFields = {};
+        if (role !== undefined) updateFields.role = role;
+        if (status !== undefined) updateFields.status = status;
+        if (balance !== undefined) updateFields.balance = balance;
+
         const user = await User.findByIdAndUpdate(
             req.params.userId,
-            { role, status },
+            updateFields,
             { new: true, select: '-password' }
         );
         
+        console.log('User updated in DB:', user); // Added console.log
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }

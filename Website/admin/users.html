@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management - Admin Panel</title>
-    <link rel="stylesheet" href="../css/style.css">
     <style>
         .users-table {
             width: 100%;
@@ -100,6 +99,7 @@
                                 <th>Email</th>
                                 <th>Role</th>
                                 <th>Status</th>
+                                <th>Balance</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -129,6 +129,11 @@
                     <td>${user.role}</td>
                     <td class="status-${user.status ? 'active' : 'locked'}">
                         ${user.status ? 'Active' : 'Locked'}
+                    </td>
+                    <td>
+                        Balance: ${user.balance !== undefined ? user.balance.toLocaleString() : 'N/A'}
+                        <input type="number" id="balance-${user._id}" placeholder="New Balance" style="width: 100px; margin-left: 5px;">
+                        <button class="action-btn" onclick="updateBalance('${user._id}')">Update Balance</button>
                     </td>
                     <td>
                         <button 
@@ -208,6 +213,7 @@
                 const token = checkAuth();
                 
                 try {
+                    console.log('Sending update to backend:', userId, JSON.stringify(updateData));
                     const response = await fetch(`/api/users/${userId}`, {
                         method: 'PUT',
                         headers: {
@@ -217,12 +223,37 @@
                         body: JSON.stringify(updateData)
                     });
 
-                    if (!response.ok) throw new Error('Failed to update user');
+                    const result = await response.json();
+                    console.log('Backend response:', result);
+
+                    if (!response.ok) {
+                        throw new Error(result.message || 'Failed to update user');
+                    }
                     await loadUsers();
                 } catch (error) {
+                    console.error('Error updating user:', error);
                     errorMessage.textContent = error.message;
                     errorMessage.style.display = 'block';
                 }
+            }
+
+            // Update user balance
+            async function updateBalance(userId) {
+                console.log('updateBalance called with userId:', userId);
+                const balanceInput = document.getElementById(`balance-${userId}`);
+                if (!balanceInput) {
+                    console.error('Could not find balance input element for userId:', userId);
+                    alert('Error: Could not find balance input element.');
+                    return;
+                }
+                const newBalance = parseFloat(balanceInput.value);
+                console.log('Updating balance for userId:', userId, 'New balance:', newBalance);
+
+                if (isNaN(newBalance) || newBalance < 0) {
+                    alert('Please enter a valid, non-negative balance.');
+                    return;
+                }
+                await updateUser(userId, { balance: newBalance });
             }
 
             // Load users when page loads

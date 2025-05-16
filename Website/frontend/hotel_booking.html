@@ -205,8 +205,13 @@
                     throw new Error(result.message || 'Có lỗi xảy ra khi đặt phòng');
                 }
 
-                alert('Đặt phòng thành công!');
-                window.location.href = 'payment.html'; // Redirect to payment page
+                alert(result.message); // Display message from backend
+                if (result.redirectToPayment) {
+                    window.location.href = 'payment.html'; // Redirect to payment page
+                } else {
+                     // Redirect to home or a relevant page like 'my_orders.html'
+                    window.location.href = 'Home page.HTML';
+                }
                 // Redirect to booking confirmation page or show booking details
             } catch (error) {
                 alert(error.message);

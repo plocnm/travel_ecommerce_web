@@ -48,7 +48,8 @@ router.get('/me', authMiddleware, async (req, res) => {
         res.json({
             name: user.name,
             email: user.email,
-            phone: user.phone // Assuming 'phone' exists on your User model
+            phone: user.phone, // Assuming 'phone' exists on your User model
+            balance: user.balance // Add balance to the response
         });
     } catch (error) {
         console.error('Error fetching current user details:', error);

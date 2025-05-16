@@ -538,7 +538,7 @@
 
                 if (response.ok) { // status 200-299
                     alert('Đặt tour thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.');
-                    window.location.href = 'Home page.HTML'; // Redirect to home or a booking confirmation page
+                    window.location.href = 'payment.html'; // Redirect to payment page
                 } else {
                     // Display error message from backend if available, otherwise a generic one
                     alert(`Đặt tour thất bại: ${result.message || response.statusText}`);

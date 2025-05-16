@@ -180,7 +180,7 @@
         <nav>
             <ul>
                 <li><a id="user-nav-link" onclick="toggleSidebar()">Tài khoản</a></li>
-                <li><a>SỐ DƯ</a></li>
+                <li><a id="balance-link">SỐ DƯ</a></li>
                 <li><a href="flight_booking.html">Đặt Vé Máy Bay</a></li>
                 <li><a href="hotel_booking.html">Đặt Khách Sạn</a></li>
                 <li><a href="payment.html">Nạp tiền</a></li>
@@ -264,6 +264,45 @@
             const overlay = document.querySelector('.overlay');
             sidebar.classList.toggle('active');
             overlay.classList.toggle('active');
+        }
+
+        async function showBalance() {
+            const token = localStorage.getItem('userToken');
+            if (!token) {
+                alert('Bạn cần đăng nhập để xem số dư.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/users/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 401) {
+                     alert('Phiên đăng nhập đã hết hạn hoặc không hợp lệ. Vui lòng đăng nhập lại.');
+                     localStorage.removeItem('userToken');
+                     localStorage.removeItem('userData');
+                     localStorage.removeItem('userName');
+                     window.location.href = 'login.html';
+                     return;
+                }
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                }
+
+                const userData = await response.json();
+                const formattedBalance = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(userData.balance);
+                alert(`Số dư của bạn là: ${formattedBalance}`);
+
+            } catch (error) {
+                console.error('Lỗi khi lấy số dư:', error);
+                alert(`Không thể lấy số dư: ${error.message}`);
+            }
         }
 
         function handleMenuClick(sectionId) {
@@ -369,6 +408,11 @@ async function loadTours() {
                 }
             }
             loadTours(); // Load tours when DOM is ready
+
+            const balanceLink = document.getElementById('balance-link');
+            if (balanceLink) {
+                balanceLink.addEventListener('click', showBalance);
+            }
         });
     </script>
 </body>

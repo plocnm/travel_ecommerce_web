@@ -23,11 +23,21 @@
                     <option value="Hue">
                 </datalist>
             </div>
-            <input type="date" id="flight-date">
-            <select id="class">
-                <option value="economy">Phổ thông</option>
-                <option value="business">Thương gia</option>
-            </select>
+            <div class="form-group">
+                <label for="flight-date">Ngày bay</label>
+                <input type="date" id="flight-date" title="Chọn ngày bay">
+            </div>
+            <div class="form-group">
+                <label for="class">Hạng ghế</label>
+                <select id="class" title="Chọn hạng ghế">
+                    <option value="economy">Phổ thông</option>
+                    <option value="business">Thương gia</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="passengers">Số lượng hành khách</label>
+                <input type="number" id="passengers" value="1" min="1" title="Chọn số lượng hành khách">
+            </div>
             <button onclick="searchFlights()">Tìm chuyến bay</button>
         </div>
 
@@ -60,41 +70,42 @@
         });
 
         async function searchFlights() {
-    const from = document.getElementById('from').value;
-    const to = document.getElementById('to').value;
-    const date = document.getElementById('flight-date').value;
-    const flightClass = document.getElementById('class').value;
+            const from = document.getElementById('from').value;
+            const to = document.getElementById('to').value;
+            const date = document.getElementById('flight-date').value;
+            const flightClass = document.getElementById('class').value;
+            const passengers = document.getElementById('passengers').value;
 
-    if (!from || !to || !date) {
-        alert("Vui lòng nhập đầy đủ thông tin chuyến bay.");
-        return;
-    }
+            if (!from || !to || !date) {
+                alert("Vui lòng nhập đầy đủ thông tin chuyến bay.");
+                return;
+            }
 
-    if(date < new Date().toISOString().split('T')[0]) {
-        alert("Ngày bay không hợp lệ.");
-        return;
-    }
+            if(date < new Date().toISOString().split('T')[0]) {
+                alert("Ngày bay không hợp lệ.");
+                return;
+            }
 
-    const resultsSection = document.getElementById('flight-results');
-    const flightsList = document.getElementById('flights-list');
-    flightsList.innerHTML = '<p>Đang tìm kiếm chuyến bay...</p>';
-    resultsSection.style.display = 'block';
+            const resultsSection = document.getElementById('flight-results');
+            const flightsList = document.getElementById('flights-list');
+            flightsList.innerHTML = '<p>Đang tìm kiếm chuyến bay...</p>';
+            resultsSection.style.display = 'block';
 
-    try {
-        const response = await fetch(`http://localhost:5500/api/flights/search?departure=${encodeURIComponent(from)}&arrival=${encodeURIComponent(to)}&date=${date}&class=${flightClass}`);
-        const flights = await response.json();
+            try {
+                const response = await fetch(`http://localhost:5500/api/flights/search?departure=${encodeURIComponent(from)}&arrival=${encodeURIComponent(to)}&date=${date}&class=${flightClass}&passengers=${passengers}`);
+                const flights = await response.json();
 
-        if (!response.ok) {
-            throw new Error(flights.message || 'Lỗi khi tìm kiếm chuyến bay');
+                if (!response.ok) {
+                    throw new Error(flights.message || 'Lỗi khi tìm kiếm chuyến bay');
+                }
+
+                displayFlights(flights, flightClass, parseInt(passengers));
+            } catch (error) {
+                flightsList.innerHTML = `<p class="error">${error.message}</p>`;
+            }
         }
 
-        displayFlights(flights);
-    } catch (error) {
-        flightsList.innerHTML = `<p class="error">${error.message}</p>`;
-    }
-}
-
-        function displayFlights(flights) {
+        function displayFlights(flights, flightClass, passengerCount) {
             const flightsList = document.getElementById('flights-list');
             if (flights.length === 0) {
                 flightsList.innerHTML = '<p>Không tìm thấy chuyến bay phù hợp.</p>';
@@ -108,7 +119,7 @@
                     <p><strong>Đến:</strong> ${flight.arrival.city} (${new Date(flight.arrival.time).toLocaleString()})</p>
                     <p><strong>Giá:</strong> ${formatPrice(flight.price)} VNĐ</p>
                     <p><strong>Còn trống:</strong> ${flight.availableSeats} chỗ</p>
-                    <button onclick="bookFlight('${flight._id}')">Đặt vé</button>
+                    <button onclick="bookFlight('${flight._id}', ${passengerCount}, '${flightClass}')">Đặt vé</button>
                 </div>
             `).join('');
         }
@@ -117,12 +128,15 @@
             return price.toLocaleString('vi-VN');
         }
 
-        async function bookFlight(flightId) {
+        async function bookFlight(flightId, passengerCount, flightClass) {
             const token = localStorage.getItem('userToken');
             if (!token) {
                 alert('Vui lòng đăng nhập để đặt vé');
                 return;
             }
+
+            // Create a dummy passengers array
+            const passengersArray = Array(passengerCount).fill({}).map((_, index) => ({ name: `Passenger ${index + 1}` }));
 
             try {
                 const response = await fetch('http://localhost:5500/api/flights/book', {
@@ -131,7 +145,7 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({ flightId })
+                    body: JSON.stringify({ flightId, passengers: passengersArray, class: flightClass })
                 });
 
                 const result = await response.json();

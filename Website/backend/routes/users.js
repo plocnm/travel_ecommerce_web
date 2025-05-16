@@ -14,7 +14,7 @@ const verifyAdmin = async (req, res, next) => {
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        if (decoded.role !== 'admin' && decoded.role !== 'user') {
+        if (decoded.role !== 'admin') {
             return res.status(403).json({ message: 'Admin access required' });
         }
         req.user = decoded; // Add user info to request

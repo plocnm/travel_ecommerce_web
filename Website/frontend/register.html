@@ -37,6 +37,11 @@
                 alert("Vui lòng điền đầy đủ thông tin.");
                 return;
             }
+
+            if(phone.length < 10 || phone.length > 15) {
+                alert("Số điện thoại không hợp lệ. Vui lòng nhập lại.");
+                return;
+            }
     
             if (password !== confirmPassword) {
                 alert("Mật khẩu xác nhận không khớp. Vui lòng thử lại.");

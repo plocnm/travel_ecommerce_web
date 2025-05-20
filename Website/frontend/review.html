@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đánh Giá Dịch Vụ</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="review.css">
+</head>
+<body>
+    <header>
+        <h1>
+            <a href="Home page.HTML"> <img src="images/image1.png" alt="TrungLH Travel" width="120"></a>
+        </h1>
+        <nav>
+            <ul>
+                <li><a href="Home page.HTML">Trang Chủ</a></li>
+                <li><a href="my_orders.html">Đơn Hàng Của Tôi</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="review-container">
+            <h2>Đánh Giá Dịch Vụ</h2>
+            <div id="booking-details">
+                <!-- Content for booking details will be populated by JS if needed -->
+            </div>
+            <form id="review-form" class="review-form">
+                <div class="star-rating-group" role="group" aria-label="Đánh giá bằng sao">
+                    <input type="radio" name="rating" value="5" id="star5" aria-label="5 sao">
+                    <label for="star5" title="5 sao"></label>
+                    <input type="radio" name="rating" value="4" id="star4" aria-label="4 sao">
+                    <label for="star4" title="4 sao"></label>
+                    <input type="radio" name="rating" value="3" id="star3" aria-label="3 sao">
+                    <label for="star3" title="3 sao"></label>
+                    <input type="radio" name="rating" value="2" id="star2" aria-label="2 sao">
+                    <label for="star2" title="2 sao"></label>
+                    <input type="radio" name="rating" value="1" id="star1" aria-label="1 sao">
+                    <label for="star1" title="1 sao"></label>
+                </div>
+                <textarea name="comment" placeholder="Chia sẻ trải nghiệm của bạn (tối thiểu 10 ký tự)" required minlength="10" maxlength="500" aria-label="Nhận xét của bạn"></textarea>
+                <div id="error-message" class="error-message" role="alert"></div>
+                <div id="success-message" class="success-message" role="alert"></div>
+                <button type="submit" class="submit-btn button-style">Gửi Đánh Giá</button>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 TrungLH Travel</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('userToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookingId = urlParams.get('bookingId');
+            const bookingType = urlParams.get('type'); // Capture type for later use
+
+            if (!bookingId) {
+                window.location.href = 'my_orders.html';
+                return;
+            }
+            
+            // You might want to fetch and display some booking details here
+            // For example, which flight/hotel/tour is being reviewed.
+            // const bookingDetailsContainer = document.getElementById('booking-details');
+            // bookingDetailsContainer.innerHTML = `<p>Đang tải chi tiết đơn hàng...</p>`;
+            // fetch(`/api/bookings/${bookingId}`, { headers: { 'Authorization': `Bearer ${token}` }})
+            // .then(res => res.json())
+            // .then(booking => {
+            //    bookingDetailsContainer.innerHTML = `<h3>Reviewing: ${booking.type} booking - ID: ${booking._id}</h3>`;
+            // });
+
+            fetch(`/api/reviews/booking/${bookingId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (response.status === 404) { // No review found, good to proceed
+                    return null;
+                }
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Failed to check for existing review');
+            })
+            .then(review => {
+                if (review) {
+                    document.querySelector('.review-container').innerHTML = `
+                        <div class="existing-review-display">
+                            <h2>Đánh Giá Đã Tồn Tại</h2>
+                            <p>Bạn đã đánh giá đơn hàng này trước đó.</p>
+                            <div class="stars">
+                                ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}
+                            </div>
+                            <p>${review.comment}</p>
+                            <a href="my_orders.html" class="button-style return-btn">Quay Lại Đơn Hàng</a>
+                        </div>
+                    `;
+                }
+            })
+            .catch(err => {
+                console.error("Error checking for existing review:", err);
+                // Optionally display an error to the user if checking fails
+            });
+
+            document.getElementById('review-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const rating = document.querySelector('input[name="rating"]:checked')?.value;
+                const comment = document.querySelector('textarea[name="comment"]').value;
+                const errorMessageDiv = document.getElementById('error-message');
+                const successMessageDiv = document.getElementById('success-message');
+
+                if (!rating) {
+                    showError('Vui lòng chọn số sao đánh giá', errorMessageDiv, successMessageDiv);
+                    return;
+                }
+                if (comment.length < 10) {
+                    showError('Nhận xét phải có ít nhất 10 ký tự', errorMessageDiv, successMessageDiv);
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/reviews', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            bookingId,
+                            rating: parseInt(rating),
+                            comment,
+                            type: bookingType || 'tour' // Use captured type
+                        })
+                    });
+
+                    const data = await response.json();
+                    if (response.ok) {
+                        showSuccess('Cảm ơn bạn đã đánh giá!', successMessageDiv, errorMessageDiv);
+                        document.getElementById('review-form').style.display = 'none';
+                        setTimeout(() => {
+                            window.location.href = 'my_orders.html';
+                        }, 2500);
+                    } else {
+                        showError(data.message || 'Có lỗi xảy ra khi gửi đánh giá', errorMessageDiv, successMessageDiv);
+                    }
+                } catch (error) {
+                    console.error('Submit review error:', error);
+                    showError('Có lỗi kết nối khi gửi đánh giá. Vui lòng thử lại.', errorMessageDiv, successMessageDiv);
+                }
+            });
+        });
+
+        function showError(message, errorDiv, successDiv) {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            successDiv.style.display = 'none';
+        }
+
+        function showSuccess(message, successDiv, errorDiv) {
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            errorDiv.style.display = 'none';
+        }
+    </script>
+</body>
+</html> 

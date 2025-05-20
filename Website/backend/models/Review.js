@@ -6,11 +6,15 @@ const reviewSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    booking: { // This links the review to a specific booking
+    booking: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Booking',
-        required: true,
-        unique: true // Ensure only one review per booking
+        required: true
+    },
+    type: {
+        type: String,
+        enum: ['flight', 'hotel', 'tour'],
+        required: true
     },
     rating: {
         type: Number,
@@ -20,7 +24,9 @@ const reviewSchema = new mongoose.Schema({
     },
     comment: {
         type: String,
-        trim: true
+        required: true,
+        minlength: 10,
+        maxlength: 500
     },
     createdAt: {
         type: Date,
@@ -28,4 +34,9 @@ const reviewSchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('Review', reviewSchema); 
+// Ensure one review per booking
+reviewSchema.index({ booking: 1 }, { unique: true });
+
+const Review = mongoose.model('Review', reviewSchema);
+
+module.exports = Review; 

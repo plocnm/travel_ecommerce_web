@@ -1,0 +1,155 @@
+/* Review Page Specific Styles */
+.review-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.review-container h2 {
+    color: #007bff; /* From original styles.css .title */
+    font-size: 24px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: 700;
+}
+
+/* Star Rating Styles */
+.star-rating-group {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 2rem 0;
+}
+
+.star-rating-group input[type="radio"] {
+    display: none;
+}
+
+.star-rating-group label {
+    cursor: pointer;
+    font-size: 40px;
+    color: #ddd;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.star-rating-group label:before {
+    content: '★';
+}
+
+.star-rating-group input[type="radio"]:checked ~ label {
+    color: #ffd700;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.star-rating-group label:hover,
+.star-rating-group label:hover ~ label {
+    color: #fadb4e;
+    transform: scale(1.1);
+}
+
+/* Review Form Textarea */
+.review-form textarea {
+    /* Inherits from styles.css: width, padding, margin, border, border-radius, font-size, box-sizing, transition */
+    min-height: 150px;
+    resize: vertical;
+    font-family: 'Poppins', sans-serif;
+}
+
+.review-form textarea:focus {
+    /* Inherits focus styles from styles.css */
+}
+
+/* Submit Button for Review Form */
+.review-form .submit-btn {
+    /* Inherits from styles.css .button-style: display, width, padding, background, color, border, border-radius, cursor, font-size, font-weight, text-align, text-decoration, transition, box-sizing */
+    margin-top: 1rem;
+}
+
+.review-form .submit-btn:hover {
+    /* Inherits hover styles from styles.css .button-style */
+}
+
+/* Error and Success Messages */
+.error-message, .success-message {
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    text-align: center;
+    font-weight: 500;
+    display: none; /* Hidden by default */
+}
+
+.error-message {
+    background-color: #fff2f2;
+    color: #dc3545;
+    border: 1px solid #ffcdd2;
+}
+
+.success-message {
+    background-color: #f0fff4;
+    color: #28a745;
+    border: 1px solid #c3e6cb;
+}
+
+/* Booking Details (if you plan to show them on review page) */
+#booking-details {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    border: 1px solid #e0e0e0;
+}
+
+#booking-details h3 {
+    color: #333;
+    margin-top: 0;
+    font-weight: 600;
+}
+
+/* Existing Review Display */
+.existing-review-display {
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.existing-review-display .stars {
+    font-size: 28px; /* Larger stars for display */
+    color: #ffd700;
+    margin: 0.5rem 0;
+}
+
+.existing-review-display p {
+    color: #555;
+    line-height: 1.6;
+    margin: 1rem 0;
+    font-style: italic;
+}
+
+/* Link styled as a button for returning to orders */
+.existing-review-display .return-btn {
+    /* Inherits from styles.css .button-style */
+    margin-top: 1.5rem;
+    display: inline-block; /* Allow centering with text-align on parent */
+    width: auto; /* Auto width based on content */
+    padding: 10px 20px; /* Adjust padding */
+}
+
+/* Responsive Design for Review Page Elements */
+@media (max-width: 768px) {
+    .review-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+
+    .star-rating-group label {
+        font-size: 32px;
+    }
+
+    .review-container h2 {
+        font-size: 20px;
+    }
+} 

@@ -118,9 +118,7 @@
                 }
                 
                 // Add review button for completed and paid bookings
-                if (booking.status === 'completed' || (booking.status === 'confirmed' && booking.paymentStatus === 'paid')) {
-                    detailsHtml += `<button class="review-btn" data-booking-id="${booking._id}">Để lại đánh giá</button>`;
-                }
+                                if (booking.status === 'completed' || (booking.status === 'confirmed' && booking.paymentStatus === 'paid')) {                    detailsHtml += `<a href="review.html?bookingId=${booking._id}&type=${booking.type}" class="review-btn">Để lại đánh giá</a>`;                }
 
                 li.innerHTML = detailsHtml;
                 ul.appendChild(li);
@@ -128,14 +126,14 @@
             container.appendChild(ul);
 
             // Add event listeners for review buttons
-            document.querySelectorAll('.review-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const bookingId = this.dataset.bookingId;
-                    // For now, just log. Later, this will open a review modal.
-                    console.log(`Review button clicked for booking: ${bookingId}`);
-                    alert(`Để lại đánh giá cho đơn hàng ${bookingId} (chức năng đang phát triển)`);
-                });
-            });
+            // document.querySelectorAll('.review-btn').forEach(button => {
+            //     button.addEventListener('click', function() {
+            //         const bookingId = this.dataset.bookingId;
+            //         // For now, just log. Later, this will open a review modal.
+            //         console.log(`Review button clicked for booking: ${bookingId}`);
+            //         alert(`Để lại đánh giá cho đơn hàng ${bookingId} (chức năng đang phát triển)`);
+            //     });
+            // });
         }
     </script>
 </body>

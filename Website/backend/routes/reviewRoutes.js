@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Review = require('../models/Review');
 const Booking = require('../models/Booking');
-const { authMiddleware } = require('../middleware/authMiddleware'); // Correctly import authMiddleware
+const { authMiddleware, verifyAdmin } = require('../middleware/authMiddleware');
 
 // @route   POST /api/reviews
 // @desc    Create a new review
@@ -109,12 +109,12 @@ router.put('/:id', authMiddleware, async (req, res) => {
     }
 });
 
-// Delete a review
-router.delete('/:id', authMiddleware, async (req, res) => {
+// Delete a review (admin quyền xóa mọi review)
+router.delete('/:id', verifyAdmin, async (req, res) => {
     try {
-        const review = await Review.findOneAndDelete({ _id: req.params.id, user: req.user.id });
+        const review = await Review.findByIdAndDelete(req.params.id);
         if (!review) {
-            return res.status(404).json({ message: 'Review not found or unauthorized' });
+            return res.status(404).json({ message: 'Review not found' });
         }
         res.json({ message: 'Review deleted successfully' });
     } catch (error) {

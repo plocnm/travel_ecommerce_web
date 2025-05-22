@@ -1075,7 +1075,7 @@ async function loadTourReviews(tourId) {
         const reviews = await response.json();
 
         if (reviews.length === 0) {
-            reviewTableBody.innerHTML = `<tr><td colspan="5">No reviews found for this tour.</td></tr>`;
+            reviewTableBody.innerHTML = `<tr><td colspan="5">Hiện không có đánh giá nào</td></tr>`;
         } else {
             reviews.forEach(review => {
                 const row = reviewTableBody.insertRow();
@@ -1094,7 +1094,7 @@ async function loadTourReviews(tourId) {
         reviewSection.classList.remove('hidden');
     } catch (err) {
         console.error(err);
-        reviewTableBody.innerHTML = `<tr><td colspan="5">Error loading reviews</td></tr>`;
+        reviewTableBody.innerHTML = `<tr><td colspan="5">Hiện không có đánh giá nào</td></tr>`;
     }
 }
 

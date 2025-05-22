@@ -99,6 +99,26 @@
                     </table>
                 </div>
 
+                <!-- Tour Reviews Section (ẩn mặc định, chỉ hiện khi bấm nút Review) -->
+                <section id="reviewSection" class="hidden" style="position: relative; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin: 24px 0; padding: 24px;">
+                    <span class="close-btn" style="position: absolute; right: 16px; top: 12px; font-size: 22px; cursor: pointer; color: #888;" onclick="document.getElementById('reviewSection').classList.add('hidden')">&times;</span>
+                    <h2 style="margin-top: 0;">Tour Reviews</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Rating</th>
+                                <th>Comment</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviewTableBody">
+                            <!-- Reviews will be loaded here -->
+                        </tbody>
+                    </table>
+                </section>
+
                 <!-- Loading Spinner -->
                 <div id="loadingSpinner" class="spinner hidden">
                     <div class="spinner-border" role="status">

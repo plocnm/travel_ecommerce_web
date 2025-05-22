@@ -41,7 +41,7 @@ router.get('/', async (req, res) => {
 // Get tour by ID
 router.get('/:id', async (req, res) => {
     try {
-        const tour = await Tour.findById(req.params.id);
+        const tour = await Tour.findById(req.params.id).populate('reviews.user', 'name');
         if (!tour) {
             return res.status(404).json({ message: 'Tour not found' });
         }

@@ -150,7 +150,7 @@
     <div class="sidebar">
         <div class="user-header">
             <h2 id="sidebar-user-name">V&ocirc;circ; sắc Hoa</h2>
-            <p>Bạn là thành viên Bronze Priority</p>
+            <p id="sidebar-user-tier">Bạn là thành viên Bronze Priority</p>
         </div>
 
         <div class="points">
@@ -266,6 +266,27 @@
             overlay.classList.toggle('active');
         }
 
+        function updateUserTierVisuals(tierName) {
+            const sidebarUserTier = document.getElementById('sidebar-user-tier');
+            const userHeaderDiv = document.querySelector('.sidebar .user-header');
+
+            tierName = tierName || 'Bronze'; // Default to Bronze if undefined
+            sidebarUserTier.textContent = `Bạn là thành viên ${tierName} Priority`;
+
+            // Reset to default Bronze gradient first
+            userHeaderDiv.style.background = 'linear-gradient(to right, #c19a6b, #deb887)';
+
+            if (tierName === 'Silver') {
+                userHeaderDiv.style.background = '#d8d8d8';
+            } else if (tierName === 'Gold') {
+                userHeaderDiv.style.background = '#f5bf03';
+            } else if (tierName === 'Diamond') {
+                userHeaderDiv.style.background = 'linear-gradient(to right, #B9F2FF, green)';
+            } else if (tierName === 'Bronze') {
+                // Default gradient is already set above
+            }
+        }
+
         async function showBalance() {
             const token = localStorage.getItem('userToken');
             if (!token) {
@@ -298,6 +319,15 @@
                 const userData = await response.json();
                 const formattedBalance = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(userData.balance);
                 alert(`Số dư của bạn là: ${formattedBalance}`);
+
+                // Update visuals after fetching fresh user data which includes the tier
+                updateUserTierVisuals(userData.tier);
+                // Also ensure name is up-to-date in sidebar and nav, as it might have changed
+                const sidebarUserName = document.getElementById('sidebar-user-name');
+                const userNavLink = document.getElementById('user-nav-link');
+                if (sidebarUserName) sidebarUserName.textContent = userData.name;
+                if (userNavLink) userNavLink.textContent = userData.name;
+                localStorage.setItem('userName', userData.name); // Keep local storage updated
 
             } catch (error) {
                 console.error('Lỗi khi lấy số dư:', error);
@@ -392,22 +422,61 @@ async function loadTours() {
     }
 }
 
-        // Check if user is logged in and display their name
-        document.addEventListener('DOMContentLoaded', function() {
-            const userName = localStorage.getItem('userName');
+        // Check if user is logged in and update UI
+        document.addEventListener('DOMContentLoaded', async function() {
+            const token = localStorage.getItem('userToken');
             const sidebarUserName = document.getElementById('sidebar-user-name');
             const userNavLink = document.getElementById('user-nav-link');
-            
-            if (userName) {
-                sidebarUserName.textContent = userName;
-                userNavLink.textContent = userName;
-            } else {
-                // If not logged in, redirect to login page, unless on index.html or register.html
-                if (!window.location.pathname.endsWith('index.html') && !window.location.pathname.endsWith('register.html')) {
-                    window.location.href = 'login.html';
+            const sidebarUserTier = document.getElementById('sidebar-user-tier');
+
+            if (token) {
+                try {
+                    const response = await fetch('/api/users/me', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+
+                    if (response.status === 401) {
+                        alert('Phiên đăng nhập đã hết hạn hoặc không hợp lệ. Vui lòng đăng nhập lại.');
+                        localStorage.removeItem('userToken');
+                        localStorage.removeItem('userName'); 
+                        localStorage.removeItem('userData');
+                        
+                        sidebarUserName.textContent = 'Vô Danh';
+                        userNavLink.textContent = 'Tài khoản';
+                        sidebarUserTier.textContent = 'Đăng nhập để xem hạng';
+                        // On HomePage.HTML, we update UI. Other pages that strictly require login might redirect here.
+                        return; 
+                    } else if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('Lỗi khi lấy thông tin người dùng:', errorData.message || `HTTP error! status: ${response.status}`);
+                        sidebarUserName.textContent = 'Vô Danh';
+                        userNavLink.textContent = 'Tài khoản';
+                        sidebarUserTier.textContent = 'Lỗi tải dữ liệu';
+                    } else {
+                        const userData = await response.json();
+                        sidebarUserName.textContent = userData.name;
+                        userNavLink.textContent = userData.name;
+                        
+                        updateUserTierVisuals(userData.tier);
+                        
+                        localStorage.setItem('userName', userData.name); 
+                    }
+                } catch (error) {
+                    console.error('Lỗi kết nối hoặc xử lý khi lấy thông tin người dùng:', error);
+                    sidebarUserName.textContent = 'Vô Danh';
+                    userNavLink.textContent = 'Tài khoản';
+                    sidebarUserTier.textContent = 'Lỗi kết nối';
                 }
+            } else {
+                // No token, user is not logged in
+                sidebarUserName.textContent = 'Vô Danh'; 
+                userNavLink.textContent = 'Tài khoản';
+                sidebarUserTier.textContent = 'Đăng nhập để xem hạng';
+                // No redirect from HomePage.HTML itself if not logged in.
+                // Pages requiring login should have their own guards or this script adapted if used elsewhere.
             }
-            loadTours(); // Load tours when DOM is ready
+
+            loadTours(); // Load tours regardless of login state
 
             const balanceLink = document.getElementById('balance-link');
             if (balanceLink) {

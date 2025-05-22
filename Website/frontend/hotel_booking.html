@@ -49,7 +49,7 @@
         function navigateHome() {
             const userToken = localStorage.getItem('userToken');
             if (userToken) {
-                window.location.href = 'Home page.HTML';
+                window.location.href = 'HomePage.HTML';
             } else {
                 window.location.href = 'index.html';
             }
@@ -210,7 +210,7 @@
                     window.location.href = 'payment.html'; // Redirect to payment page
                 } else {
                      // Redirect to home or a relevant page like 'my_orders.html'
-                    window.location.href = 'Home page.HTML';
+                    window.location.href = 'HomePage.HTML';
                 }
                 // Redirect to booking confirmation page or show booking details
             } catch (error) {

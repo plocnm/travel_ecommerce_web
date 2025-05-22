@@ -32,6 +32,11 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'admin'],
         default: 'user'
     },
+    tier: {
+        type: String,
+        enum: ['Bronze', 'Silver', 'Gold', 'Diamond'],
+        default: 'Bronze'
+    },
     isVerified: {  
         type: Boolean,
         default: false
@@ -51,6 +56,21 @@ const userSchema = new mongoose.Schema({
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
     this.password = await bcrypt.hash(this.password, 10);
+    next();
+});
+
+userSchema.pre('save', function(next) {
+    if (this.isModified('balance') || this.isNew) {
+        if (this.balance > 100000000) {
+            this.tier = 'Diamond';
+        } else if (this.balance > 50000000) {
+            this.tier = 'Gold';
+        } else if (this.balance > 10000000) {
+            this.tier = 'Silver';
+        } else {
+            this.tier = 'Bronze';
+        }
+    }
     next();
 });
 

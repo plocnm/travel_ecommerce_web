@@ -47,6 +47,36 @@ router.get('/booking/:bookingId', async (req, res) => {
     }
 });
 
+// Get reviews for a specific tour
+router.get('/tour/:tourId', async (req, res) => {
+    try {
+        // Find bookings related to the tourId
+        const bookings = await Booking.find({ 'tour.tour': req.params.tourId });
+        if (!bookings || bookings.length === 0) {
+            return res.status(404).json({ message: 'No bookings found for this tour, hence no reviews.' });
+        }
+
+        const bookingIds = bookings.map(b => b._id);
+
+        // Find reviews for these bookings of type 'tour'
+        const reviews = await Review.find({
+            booking: { $in: bookingIds },
+            type: 'tour'
+        })
+        .populate('user', 'name') // Populate user's name
+        .sort({ createdAt: -1 });
+
+        if (!reviews || reviews.length === 0) {
+            return res.status(404).json({ message: 'No reviews found for this tour' });
+        }
+
+        res.json(reviews);
+    } catch (error) {
+        console.error('Error fetching reviews by tour:', error);
+        res.status(500).json({ message: 'Error fetching reviews for tour' });
+    }
+});
+
 // Get all reviews by a user
 router.get('/user', authMiddleware, async (req, res) => {
     try {

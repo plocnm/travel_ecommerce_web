@@ -2,12 +2,12 @@ const express = require('express');
 const router = express.Router();
 const Review = require('../models/Review');
 const Booking = require('../models/Booking');
-const auth = require('../middleware/authMiddleware'); // Assuming you have auth middleware
+const { authMiddleware } = require('../middleware/authMiddleware'); // Correctly import authMiddleware
 
 // @route   POST /api/reviews
 // @desc    Create a new review
 // @access  Private
-router.post('/', auth, async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     try {
         const { bookingId, rating, comment, type } = req.body;
 
@@ -48,7 +48,7 @@ router.get('/booking/:bookingId', async (req, res) => {
 });
 
 // Get all reviews by a user
-router.get('/user', auth, async (req, res) => {
+router.get('/user', authMiddleware, async (req, res) => {
     try {
         const reviews = await Review.find({ user: req.user.id })
             .populate('booking')
@@ -60,7 +60,7 @@ router.get('/user', auth, async (req, res) => {
 });
 
 // Update a review
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
     try {
         const { rating, comment } = req.body;
         const review = await Review.findOne({ _id: req.params.id, user: req.user.id });
@@ -80,7 +80,7 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 // Delete a review
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
     try {
         const review = await Review.findOneAndDelete({ _id: req.params.id, user: req.user.id });
         if (!review) {

@@ -4,6 +4,7 @@ const Flight = require('../models/Flight');
 const Booking = require('../models/Booking');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { verifyAdmin } = require('../middleware/authMiddleware');
 
 // Map địa danh chuẩn hóa
 const locationMap = {
@@ -152,6 +153,87 @@ router.post('/book', async (req, res) => {
     } catch (error) {
         console.error('Flight booking error:', error);
         res.status(500).json({ message: 'Có lỗi xảy ra khi đặt vé. Vui lòng thử lại sau.' });
+    }
+});
+
+// Admin: Get all flights
+router.get('/admin', verifyAdmin, async (req, res) => {
+    try {
+        const { search } = req.query;
+        const filter = {};
+        if (search) {
+            filter.$or = [
+                { flightNumber: { $regex: search, $options: 'i' } },
+                { airline: { $regex: search, $options: 'i' } },
+                { 'departure.city': { $regex: search, $options: 'i' } },
+                { 'arrival.city': { $regex: search, $options: 'i' } }
+            ];
+        }
+        const flights = await Flight.find(filter).sort({ 'departure.time': -1 });
+        res.json(flights);
+    } catch (error) {
+        console.error('Admin: Error fetching flights:', error);
+        res.status(500).json({ message: 'Error fetching flights for admin' });
+    }
+});
+
+// Admin: Get a single flight by ID
+router.get('/admin/:id', verifyAdmin, async (req, res) => {
+    try {
+        const flight = await Flight.findById(req.params.id);
+        if (!flight) {
+            return res.status(404).json({ message: 'Flight not found' });
+        }
+        res.json(flight);
+    } catch (error) {
+        console.error('Admin: Error fetching flight by ID:', error);
+        res.status(500).json({ message: 'Error fetching flight details for admin' });
+    }
+});
+
+// Admin: Create a new flight
+router.post('/admin', verifyAdmin, async (req, res) => {
+    try {
+        const newFlight = new Flight(req.body);
+        await newFlight.save();
+        res.status(201).json(newFlight);
+    } catch (error) {
+        console.error('Admin: Error creating flight:', error);
+        if (error.code === 11000) { // Duplicate key error for flightNumber
+            return res.status(400).json({ message: 'Flight number already exists.' });
+        }
+        res.status(400).json({ message: error.message });
+    }
+});
+
+// Admin: Update a flight
+router.put('/admin/:id', verifyAdmin, async (req, res) => {
+    try {
+        const updatedFlight = await Flight.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        if (!updatedFlight) {
+            return res.status(404).json({ message: 'Flight not found' });
+        }
+        res.json(updatedFlight);
+    } catch (error) {
+        console.error('Admin: Error updating flight:', error);
+        if (error.code === 11000) {
+            return res.status(400).json({ message: 'Flight number already exists.' });
+        }
+        res.status(400).json({ message: error.message });
+    }
+});
+
+// Admin: Delete a flight
+router.delete('/admin/:id', verifyAdmin, async (req, res) => {
+    try {
+        const deletedFlight = await Flight.findByIdAndDelete(req.params.id);
+        if (!deletedFlight) {
+            return res.status(404).json({ message: 'Flight not found' });
+        }
+        res.json({ message: 'Flight deleted successfully' });
+    } catch (error) {
+        console.error('Admin: Error deleting flight:', error);
+        res.status(500).json({ message: error.message });
     }
 });
 

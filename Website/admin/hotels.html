@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Management - Travel E-commerce Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="admin-utils.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo" style="display: none;">
+                <a href="/Website/frontend/Home page.HTML">
+                    <img src="/images/image1.png" alt="TrungLH Travel" width="120">
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                <li><a href="tours.html"><i class="fas fa-map-marked-alt"></i><span>Tour Management</span></a></li>
+                <li><a href="users.html"><i class="fas fa-users"></i><span>User Management</span></a></li>
+                <li><a href="orders.html"><i class="fas fa-shopping-cart"></i><span>Order Management</span></a></li>
+                <li><a href="flights.html"><i class="fas fa-plane-departure"></i><span>Flight Management</span></a></li>
+                <li class="active"><a href="hotels.html"><i class="fas fa-hotel"></i><span>Hotel Management</span></a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1>Hotel Management</h1>
+                <div class="user-info">
+                    <span class="admin-name">Admin User</span>
+                </div>
+            </header>
+
+            <section class="hotels-section">
+                <div class="actions-bar">
+                    <button type="button" class="add-btn" onclick="showAddHotelForm()">
+                        <i class="fas fa-plus"></i> Add New Hotel
+                    </button>
+                    <div class="search-bar">
+                        <input type="text" id="searchHotel" placeholder="Search hotels by name or city...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+
+                <!-- Hotels Table -->
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>City</th>
+                                <th>Address</th>
+                                <th>Rating</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hotelsTableBody">
+                            <!-- Hotel data will be populated here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div id="loadingSpinner" class="spinner hidden">
+                    <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
+                </div>
+
+                <!-- Alerts -->
+                <div id="errorAlert" class="alert alert-danger hidden"></div>
+                <div id="successAlert" class="alert alert-success hidden"></div>
+            </section>
+
+            <!-- Add/Edit Hotel Modal -->
+            <div id="hotelModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-btn" onclick="closeHotelModal()">&times;</span>
+                    <h2 id="hotelModalTitle" class="modal-drag-header">Add New Hotel</h2>
+                    <form id="hotelForm" onsubmit="handleHotelSubmit(event)">
+                        <input type="hidden" id="hotelId">
+                        <div class="form-group">
+                            <label for="hotelName">Hotel Name</label>
+                            <input type="text" id="hotelName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" rows="3" required></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="hotelCity">City</label>
+                                <input type="text" id="hotelCity" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="hotelAddress">Address</label>
+                                <input type="text" id="hotelAddress" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                             <div class="form-group">
+                                <label for="latitude">Latitude</label>
+                                <input type="number" step="any" id="latitude">
+                            </div>
+                            <div class="form-group">
+                                <label for="longitude">Longitude</label>
+                                <input type="number" step="any" id="longitude">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="rating">Rating (0-5)</label>
+                            <input type="number" id="rating" min="0" max="5" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="amenities">Amenities (comma-separated)</label>
+                            <input type="text" id="amenities">
+                        </div>
+                        <div class="form-group">
+                            <label for="images">Images (comma-separated URLs)</label>
+                            <input type="text" id="images">
+                        </div>
+                        <div class="form-group">
+                            <label for="rooms">Rooms (JSON format)</label>
+                            <textarea id="rooms" rows="4" placeholder='[{"type":"double","price":100,"capacity":2,"available":10,"description":"Standard double room"}]'></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="contactPhone">Contact Phone</label>
+                                <input type="tel" id="contactPhone">
+                            </div>
+                            <div class="form-group">
+                                <label for="contactEmail">Contact Email</label>
+                                <input type="email" id="contactEmail">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="contactWebsite">Contact Website</label>
+                            <input type="url" id="contactWebsite">
+                        </div>
+                        <div class="form-group">
+                            <label for="hotelStatus">Status</label>
+                            <select id="hotelStatus" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="maintenance">Maintenance</option>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" onclick="closeHotelModal()" class="btn">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Hotel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete Confirmation Modal -->
+            <div id="deleteHotelModal" class="modal">
+                <div class="modal-content">
+                    <h2>Confirm Deletion</h2>
+                    <p>Are you sure you want to delete this hotel?</p>
+                    <div class="form-actions">
+                        <button onclick="closeDeleteHotelModal()" class="btn">Cancel</button>
+                        <button onclick="confirmDeleteHotel()" class="btn btn-danger">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!checkAdminAccess()) return; // Uses admin-utils.js
+
+            const userName = localStorage.getItem('userName');
+            if (userName) {
+                document.querySelector('.admin-name').textContent = userName;
+            }
+            loadHotels(); // Initial load of hotels
+
+            const searchInput = document.getElementById('searchHotel');
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce(loadHotels, 300));
+            }
+            
+            const hotelModal = document.getElementById('hotelModal');
+            if (hotelModal) {
+                const modalHeader = hotelModal.querySelector('.modal-drag-header');
+                if (modalHeader) {
+                    makeModalDraggable(hotelModal, modalHeader);
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Booking = require('../models/Booking'); // Assuming your Booking model is here
-const authMiddleware = require('../middleware/authMiddleware'); // Assuming you have auth middleware
+const { authMiddleware } = require('../middleware/authMiddleware'); // Correctly import authMiddleware
 const Tour = require('../models/Tour'); // Assuming your Tour model is here
 const User = require('../models/User'); // Import User model
 

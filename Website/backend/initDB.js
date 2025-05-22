@@ -29,7 +29,10 @@ const initializeDB = async () => {
                 email: 'admin@example.com',
                 password: 'admin123',
                 phone: '1234567890',
-                role: 'admin'
+                role: 'admin',
+                balance: 0,
+                isVerified: true,
+                verificationCode: null
             },
             {
                 name: 'John Doe',
@@ -37,9 +40,9 @@ const initializeDB = async () => {
                 password: 'user123',
                 phone: '9876543210',
                 role: 'user',
+                balance: 15000000,
                 isVerified: true,
                 verificationCode: null
-
             }
         ]);
 

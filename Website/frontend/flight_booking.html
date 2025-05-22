@@ -53,7 +53,7 @@
         function navigateHome() {
             const userToken = localStorage.getItem('userToken');
             if (userToken) {
-                window.location.href = 'Home page.HTML';
+                window.location.href = 'HomePage.HTML';
             } else {
                 window.location.href = 'index.html';
             }
@@ -157,7 +157,7 @@
                 if (result.redirectToPayment) {
                     window.location.href = 'payment.html';
                 } else {
-                    window.location.href = 'Home page.HTML';
+                    window.location.href = 'HomePage.HTML';
                 }
             } catch (error) {
                 alert(error.message);

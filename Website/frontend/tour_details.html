@@ -172,6 +172,39 @@
         .gallery-item:hover img {
             transform: scale(1.05);
         }
+
+        .reviews-section {
+            margin-top: 40px;
+        }
+
+        .review-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+        }
+
+        .review-header {
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .review-header strong {
+            color: #333;
+        }
+
+        .review-rating {
+            color: #f8b400; /* Gold color for stars */
+            margin-bottom: 8px;
+        }
+
+        .review-comment {
+            font-size: 1em;
+            color: #444;
+            line-height: 1.5;
+        }
     </style>
     <style>
         body {
@@ -287,7 +320,7 @@
         <div>Tours</div>
     </div>
 
-    <div class="logo-container" onclick="window.location.href='Home page.HTML'">
+    <div class="logo-container" onclick="window.location.href='HomePage.HTML'">
         <img src="images/image1.png" alt="TrungLH Travel">
     </div>
 
@@ -325,6 +358,13 @@
             <ul id="tour-schedule"></ul>
             <div class="details-title">Dịch vụ bao gồm</div>
             <ul id="tour-includes"></ul>
+        </div>
+
+        <div class="reviews-section details-section">
+            <h3 class="details-title">Đánh Giá Từ Khách Hàng</h3>
+            <div id="tour-reviews-container">
+                <p>Chưa có đánh giá nào cho tour này.</p>
+            </div>
         </div>
     </div>
 
@@ -415,6 +455,9 @@
                     mainImage.src = 'images/default-tour.png';
                 }
 
+                // Load tour reviews
+                await loadTourReviews(tourId);
+
                 // Call fetchUserDetails and populate form if data is available
                 const user = await fetchUserDetails();
                 if (user) {
@@ -451,19 +494,6 @@
                     includesList.innerHTML = '<li>Thông tin dịch vụ bao gồm chưa được cập nhật.</li>';
                 }
 
-                // Load excludes
-                const excludesList = document.getElementById('tour-excludes');
-                if (excludesList) { // Check if the element exists
-                    if (tour.excluded && tour.excluded.length > 0) {
-                        excludesList.innerHTML = tour.excluded.map(item => `<li>${item}</li>`).join('');
-                    } else {
-                        excludesList.innerHTML = '<li>Thông tin dịch vụ không bao gồm chưa được cập nhật.</li>';
-                    }
-                } else {
-                    // Optionally log if the element is not found, though it's expected in this case
-                    // console.log("Element with ID 'tour-excludes' not found, skipping population.");
-                }
-
                 // Load gallery
                 const galleryGrid = document.getElementById('tour-gallery');
                 galleryGrid.innerHTML = ''; // Clear previous images
@@ -486,6 +516,50 @@
                 }
                 document.getElementById('tour-image').src = 'images/default-tour.png'; // Set fallback on error
                 document.getElementById('tour-gallery').innerHTML = '<p>Không có hình ảnh nào cho tour này.</p>'; // Clear gallery on error
+            }
+        }
+
+        // Function to load tour reviews
+        async function loadTourReviews(currentTourId) {
+            const reviewsContainer = document.getElementById('tour-reviews-container');
+            reviewsContainer.innerHTML = '<p>Đang tải đánh giá...</p>'; // Loading state
+
+            try {
+                const response = await fetch(`/api/reviews/tour/${currentTourId}`);
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        reviewsContainer.innerHTML = '<p>Chưa có đánh giá nào cho tour này.</p>';
+                    } else {
+                        reviewsContainer.innerHTML = '<p>Lỗi khi tải đánh giá.</p>';
+                    }
+                    console.error('Failed to fetch reviews:', response.statusText);
+                    return;
+                }
+                
+                const reviews = await response.json();
+
+                if (reviews && reviews.length > 0) {
+                    reviewsContainer.innerHTML = reviews.map(review => {
+                        const reviewDate = new Date(review.createdAt).toLocaleDateString('vi-VN');
+                        const userReviewName = review.user ? review.user.name : 'Người dùng ẩn danh';
+                        return `
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <strong>${userReviewName}</strong> - <em>${reviewDate}</em>
+                                </div>
+                                <div class="review-rating">
+                                    ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}
+                                </div>
+                                <p class="review-comment">${review.comment}</p>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    reviewsContainer.innerHTML = '<p>Chưa có đánh giá nào cho tour này.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading tour reviews:', error);
+                reviewsContainer.innerHTML = '<p>Lỗi khi tải đánh giá. Vui lòng thử lại.</p>';
             }
         }
 
@@ -543,7 +617,7 @@
                     } else {
                         // Optionally, redirect to a booking confirmation/details page or refresh data
                         // For now, we can redirect to home or my_orders page
-                        window.location.href = 'Home page.HTML';
+                        window.location.href = 'HomePage.HTML';
                     }
                 } else {
                     // Display error message from backend if available, otherwise a generic one

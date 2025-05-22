@@ -19,18 +19,37 @@ router.get('/', verifyAdmin, async (req, res) => {
 // Get current logged-in user's details
 router.get('/me', authMiddleware, async (req, res) => {
     try {
-        // req.user is populated by authMiddleware and contains the decoded token (e.g., userId)
-        const user = await User.findById(req.user.userId).select('-password -verificationCode -resetPasswordCode -resetCodeExpiry -__v'); // Exclude sensitive fields
+        const user = await User.findById(req.user.userId);
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        // Ensure you return the fields the frontend expects: name, email, phone
+
+        // Recalculate tier to ensure it's up-to-date
+        let currentExpectedTier;
+        if (user.balance > 100000000) {
+            currentExpectedTier = 'Diamond';
+        } else if (user.balance > 50000000) {
+            currentExpectedTier = 'Gold';
+        } else if (user.balance > 10000000) {
+            currentExpectedTier = 'Silver';
+        } else {
+            currentExpectedTier = 'Bronze';
+        }
+
+        // If the stored tier is different from the expected tier, update and save
+        if (user.tier !== currentExpectedTier) {
+            user.tier = currentExpectedTier;
+            await user.save(); // This ensures the DB is updated and pre-save hook logic is consistent
+        }
+
+        // Ensure you return the fields the frontend expects, excluding sensitive ones
         res.json({
             name: user.name,
             email: user.email,
-            phone: user.phone, // Assuming 'phone' exists on your User model
-            balance: user.balance // Add balance to the response
+            phone: user.phone, 
+            balance: user.balance,
+            tier: user.tier // Return the (potentially updated) tier
         });
     } catch (error) {
         console.error('Error fetching current user details:', error);
@@ -68,23 +87,28 @@ router.put('/:userId', verifyAdmin, async (req, res) => {
     try {
         console.log('Update request for userId:', req.params.userId, 'Body:', req.body); // Added console.log
         const { role, status, balance } = req.body;
-        const updateFields = {};
-        if (role !== undefined) updateFields.role = role;
-        if (status !== undefined) updateFields.status = status;
-        if (balance !== undefined) updateFields.balance = balance;
-
-        const user = await User.findByIdAndUpdate(
-            req.params.userId,
-            updateFields,
-            { new: true, select: '-password' }
-        );
         
-        console.log('User updated in DB:', user); // Added console.log
+        const user = await User.findById(req.params.userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
+
+        if (role !== undefined) user.role = role;
+        if (status !== undefined) user.status = status; // Assuming you have a status field
+        if (balance !== undefined) user.balance = balance;
+
+        const updatedUser = await user.save(); // This will trigger the pre-save hook for tier update
         
-        res.json(user);
+        // Exclude sensitive fields for the response
+        const userResponse = updatedUser.toObject();
+        delete userResponse.password;
+        delete userResponse.verificationCode; 
+        delete userResponse.resetPasswordCode;
+        // delete userResponse.resetCodeExpiry; // If you still have this
+        delete userResponse.__v;
+
+        console.log('User updated in DB:', userResponse); 
+        res.json(userResponse);
     } catch (error) {
         console.error('Error updating user:', error);
         res.status(500).json({ message: 'Error updating user' });

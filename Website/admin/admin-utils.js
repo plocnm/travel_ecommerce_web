@@ -3,7 +3,7 @@ function checkAdminAccess() {
     const userRole = localStorage.getItem('userRole');
     
     if (!userToken || userRole !== 'admin') {
-        window.location.href = '../frontend/login.html';
+        window.location.href = '/login.html';
         return false;
     }
     return true;

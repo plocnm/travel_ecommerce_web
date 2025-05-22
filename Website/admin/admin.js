@@ -1,76 +1,77 @@
 // DOM Elements
-const tourForm = document.getElementById('tourForm');
-const userTable = document.getElementById('userTable');
-const orderTable = document.getElementById('orderTable');
+    const tourForm = document.getElementById('tourForm');
+    const userTable = document.getElementById('userTable');
+    const orderTable = document.getElementById('orderTable');
 
-let currentEditingTourId = null;
+    let currentEditingTourId = null;
 
-// Tour management functions
-async function loadTours() {
-    const toursTableBody = document.getElementById('toursTableBody');
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    const errorAlert = document.getElementById('errorAlert');
-    const searchTour = document.getElementById('searchTour').value;
+    // Tour management functions
+    async function loadTours() {
+        const toursTableBody = document.getElementById('toursTableBody');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const errorAlert = document.getElementById('errorAlert');
+        const searchTour = document.getElementById('searchTour').value;
 
-    if (!toursTableBody || !loadingSpinner || !errorAlert) {
-        console.error('Required HTML elements not found for loading tours.');
-        return;
-    }
-
-    toursTableBody.innerHTML = ''; // Clear existing rows
-    loadingSpinner.classList.remove('hidden');
-    errorAlert.classList.add('hidden');
-
-    try {
-        let url = 'http://localhost:5500/api/tours';
-        const params = new URLSearchParams();
-        if (searchTour) params.append('search', searchTour);
-        // Add other filters like status, price if needed
-        
-        if (params.toString()) {
-            url += `?${params.toString()}`;
+        if (!toursTableBody || !loadingSpinner || !errorAlert) {
+            console.error('Required HTML elements not found for loading tours.');
+            return;
         }
 
-        const response = await fetch(url, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('userToken')}`
+        toursTableBody.innerHTML = ''; // Clear existing rows
+        loadingSpinner.classList.remove('hidden');
+        errorAlert.classList.add('hidden');
+
+        try {
+            let url = 'http://localhost:5500/api/tours';
+            const params = new URLSearchParams();
+            if (searchTour) params.append('search', searchTour);
+            // Add other filters like status, price if needed
+            
+            if (params.toString()) {
+                url += `?${params.toString()}`;
             }
-        });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const tours = await response.json();
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('userToken')}`
+                }
+            });
 
-        if (tours.length === 0) {
-            toursTableBody.innerHTML = '<tr><td colspan="9">No tours found.</td></tr>';
-        } else {
-            tours.forEach(tour => {
-                const row = toursTableBody.insertRow();
-                row.innerHTML = `
-                    <td>${tour.name}</td>
-                    <td>${tour.destination}</td>
-                    <td>${tour.duration.days}D / ${tour.duration.nights}N</td>
-                    <td>${tour.price.toLocaleString()}</td>
-                    <td>${tour.maxParticipants}</td>
-                    <td>${tour.currentParticipants}</td>
-                    <td><span class="status-${tour.status.toLowerCase().replace(' ', '-')}">${tour.status}</span></td>
-                    <td>${tour.rating || 'N/A'}</td>
-                    <td class="actions">
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const tours = await response.json();
+
+            if (tours.length === 0) {
+                toursTableBody.innerHTML = '<tr><td colspan="9">No tours found.</td></tr>';
+            } else {
+                tours.forEach(tour => {
+                    const row = toursTableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${tour.name}</td>
+                        <td>${tour.destination}</td>
+                        <td>${tour.duration.days}D / ${tour.duration.nights}N</td>
+                        <td>${tour.price.toLocaleString()}</td>
+                        <td>${tour.maxParticipants}</td>
+                        <td>${tour.currentParticipants}</td>
+                        <td><span class="status-${tour.status.toLowerCase().replace(' ', '-')}">${tour.status}</span></td>
+                        <td>${tour.rating || 'N/A'}</td>
+                        <td class="actions">
                         <button class="edit-btn" onclick="showEditTourForm('${tour._id}')"><i class="fas fa-edit"></i></button>
                         <button class="delete-btn" onclick="showDeleteModal('${tour._id}')"><i class="fas fa-trash"></i></button>
+                        <button class="review-btn" onclick="loadTourReviews('${tour._id}')">Reviews</button>
                     </td>
-                `;
-            });
+                    `;
+                });
+            }
+        } catch (error) {
+            console.error('Error loading tours:', error);
+            errorAlert.textContent = `Failed to load tours: ${error.message}`;
+            errorAlert.classList.remove('hidden');
+        } finally {
+            loadingSpinner.classList.add('hidden');
         }
-    } catch (error) {
-        console.error('Error loading tours:', error);
-        errorAlert.textContent = `Failed to load tours: ${error.message}`;
-        errorAlert.classList.remove('hidden');
-    } finally {
-        loadingSpinner.classList.add('hidden');
     }
-}
 
 function showAddTourForm() {
     currentEditingTourId = null;
@@ -1053,6 +1054,73 @@ async function confirmDeleteHotel() {
         closeDeleteHotelModal();
     }
 }
+
+async function loadTourReviews(tourId) {
+    const reviewTableBody = document.getElementById('reviewTableBody');
+    const reviewSection = document.getElementById('reviewSection');
+
+    reviewTableBody.innerHTML = ''; // Clear old
+
+    try {
+        const response = await fetch(`http://localhost:5500/api/reviews/tour/${tourId}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('userToken')}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to load reviews');
+        }
+
+        const reviews = await response.json();
+
+        if (reviews.length === 0) {
+            reviewTableBody.innerHTML = `<tr><td colspan="5">No reviews found for this tour.</td></tr>`;
+        } else {
+            reviews.forEach(review => {
+                const row = reviewTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${review.user?.name || 'Unknown'}</td>
+                    <td>${review.rating}</td>
+                    <td>${review.comment}</td>
+                    <td>${new Date(review.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        <button onclick="deleteReview('${review._id}', '${tourId}')">Delete</button>
+                    </td>
+                `;
+            });
+        }
+
+        reviewSection.classList.remove('hidden');
+    } catch (err) {
+        console.error(err);
+        reviewTableBody.innerHTML = `<tr><td colspan="5">Error loading reviews</td></tr>`;
+    }
+}
+
+async function deleteReview(reviewId, tourId) {
+    if (!confirm('Are you sure you want to delete this review?')) return;
+
+    try {
+        const response = await fetch(`http://localhost:5500/api/reviews/${reviewId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('userToken')}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to delete review');
+        }
+
+        alert('Review deleted successfully');
+        loadTourReviews(tourId); // Reload after delete
+    } catch (err) {
+        alert('Error deleting review');
+        console.error(err);
+    }
+}
+
 
 function setupEventListeners() {
     console.log('setupEventListeners called. Add specific listeners as needed.');

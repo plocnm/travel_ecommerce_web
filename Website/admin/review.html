@@ -1,0 +1,94 @@
+<!-- reviews.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Management - Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="logo">
+                <a href="/HomePage.HTML">
+                    <img src="/images/image1.png" alt="TrungLH Travel" width="120">
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                <li><a href="tours.html"><i class="fas fa-map-marked-alt"></i><span>Tour Management</span></a></li>
+                <li><a href="users.html"><i class="fas fa-users"></i><span>User Management</span></a></li>
+                <li><a href="orders.html"><i class="fas fa-shopping-cart"></i><span>Order Management</span></a></li>
+                <li><a href="flights.html"><i class="fas fa-plane-departure"></i><span>Flight Management</span></a></li>
+                <li><a href="hotels.html"><i class="fas fa-hotel"></i><span>Hotel Management</span></a></li>
+                <li><a href="reviews.html" class="active"><i class="fas fa-star-half-alt"></i><span>Review Management</span></a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1>Review Management</h1>
+                <div class="user-info">
+                    <span class="admin-name">Admin User</span>
+                </div>
+            </header>
+
+            <section class="reviews-section">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Type</th>
+                                <th>Rating</th>
+                                <th>Comment</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviewsTableBody">
+                            <!-- Reviews loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Delete Confirmation Modal -->
+            <div id="deleteReviewModal" class="modal">
+                <div class="modal-content">
+                    <h2>Confirm Deletion</h2>
+                    <p>Are you sure you want to delete this review?</p>
+                    <div class="form-actions">
+                        <button class="btn" onclick="closeDeleteReviewModal()">Cancel</button>
+                        <button class="btn btn-danger" onclick="confirmDeleteReview()">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="reviews.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userToken = localStorage.getItem('userToken');
+            const userRole = localStorage.getItem('userRole');
+
+            if (!userToken || userRole !== 'admin') {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            const userName = localStorage.getItem('userName');
+            if (userName) {
+                document.querySelector('.admin-name').textContent = userName;
+            }
+
+            loadReviews();
+        });
+    </script>
+</body>
+</html>

@@ -53,7 +53,7 @@ router.get('/tour/:tourId', async (req, res) => {
         // Find bookings related to the tourId
         const bookings = await Booking.find({ 'tour.tour': req.params.tourId });
         if (!bookings || bookings.length === 0) {
-            return res.status(404).json({ message: 'No bookings found for this tour, hence no reviews.' });
+            return res.json([]); // Trả về mảng rỗng nếu không có booking
         }
 
         const bookingIds = bookings.map(b => b._id);
@@ -67,7 +67,7 @@ router.get('/tour/:tourId', async (req, res) => {
         .sort({ createdAt: -1 });
 
         if (!reviews || reviews.length === 0) {
-            return res.status(404).json({ message: 'No reviews found for this tour' });
+            return res.json([]); // Trả về mảng rỗng nếu không có review
         }
 
         res.json(reviews);

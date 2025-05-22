@@ -13,6 +13,7 @@ const userRoutes = require('./routes/users');
 const tourRoutes = require('./routes/tours');
 const bookingRoutes = require('./routes/bookings');
 const reviewRoutes = require('./routes/reviewRoutes');
+const statisticsRoutes = require('./routes/statisticsRoutes');
 
 const verifyRoutes = require('./routes/verify');
 const app = express();
@@ -64,6 +65,7 @@ app.use('/api/tours', tourRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/verify', verifyRoutes);
+app.use('/api/statistics', statisticsRoutes);
 
 const PORT = process.env.PORT || 5500;
 app.listen(PORT, '0.0.0.0', () => {

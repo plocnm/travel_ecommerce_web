@@ -365,3 +365,9 @@ tr:hover {
     border-radius: 50%;
     transition: 0.2s;
 }
+
+/* Thêm style cho icon biểu đồ (Statistics) nếu cần */
+.fas.fa-chart-bar {
+    color: #fff;
+    margin-right: 10px;
+}

@@ -57,13 +57,21 @@ router.post('/google-login', async (req, res) => {
 
         // Nếu người dùng chưa tồn tại, tạo mới
         if (!user) {
-            user = new User({
-                name,
-                email,
-                password: Math.random().toString(36).slice(-8), // tạm thời
-                isVerified: true, // bỏ qua bước xác minh email
-            });
-            await user.save();
+            try {
+                user = new User({
+                    name,
+                    email,
+                    password: Math.random().toString(36).slice(-8), // tạm thời
+                    isVerified: true, // bỏ qua bước xác minh email
+                    phone: '', // Set giá trị mặc định cho phone
+                    role: 'user' // Set role mặc định
+                });
+                await user.save();
+                console.log('Created new user from Google login:', user.email);
+            } catch (error) {
+                console.error('Error creating new user from Google login:', error);
+                return res.status(500).json({ message: 'Lỗi khi tạo tài khoản mới. Vui lòng thử lại sau.' });
+            }
         }
 
         // Tạo token JWT

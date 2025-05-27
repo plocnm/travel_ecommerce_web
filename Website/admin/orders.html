@@ -111,6 +111,9 @@
             <!-- Error Alert -->
             <div id="errorAlert" class="alert alert-danger d-none" role="alert">
             </div>
+            <!-- Success Alert -->
+            <div id="successAlert" class="alert alert-success d-none" role="alert">
+            </div>
         </main>
     </div>
 
@@ -160,7 +163,7 @@
         // This will be handled by admin.js
         document.addEventListener('DOMContentLoaded', () => {
             loadOrders();
-            setupEventListeners();
+            setupOrderPageEventListeners();
         });
     </script>
 </body>

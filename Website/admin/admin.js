@@ -536,8 +536,8 @@ async function deleteOrder(orderId) {
     }
 }
 
-function setupEventListeners() {
-    console.log('setupEventListeners called. Add specific listeners as needed.');
+function setupOrderPageEventListeners() {
+    console.log('setupEventListeners called for Orders. Add specific listeners as needed.');
     // Example: Add listener for a refresh button if it's common across admin pages
     const refreshBtn = document.getElementById('refreshBtn');
     if (refreshBtn && typeof loadOrders === 'function') { // Check if loadOrders exists for context
@@ -787,8 +787,8 @@ async function confirmDeleteFlight() {
     }
 }
 
-function setupEventListeners() {
-    console.log('setupEventListeners called. Add specific listeners as needed.');
+function setupFlightPageEventListeners() {
+    console.log('setupEventListeners called for Flights. Add specific listeners as needed.');
     // Example: Add listener for a refresh button if it's common across admin pages
     const refreshBtn = document.getElementById('refreshBtn');
     if (refreshBtn && typeof loadFlights === 'function') { // Check if loadFlights exists for context
@@ -1121,9 +1121,8 @@ async function deleteReview(reviewId, tourId) {
     }
 }
 
-
-function setupEventListeners() {
-    console.log('setupEventListeners called. Add specific listeners as needed.');
+function setupHotelPageEventListeners() {
+    console.log('setupEventListeners called for Hotels. Add specific listeners as needed.');
     // Example: Add listener for a refresh button if it's common across admin pages
     const refreshBtn = document.getElementById('refreshBtn');
     if (refreshBtn && typeof loadHotels === 'function') { // Check if loadHotels exists for context
